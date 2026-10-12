@@ -1,0 +1,768 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<script>
+(function(){
+  var key='pqc-access';
+  var token='d44348e4c88c289b38f94ad715588c168acfe25da44601f3e8c55177faaf5e90';
+  try{ if(sessionStorage.getItem(key)===token) return; }catch(e){}
+  location.replace('index.html');
+})();
+</script>
+</head><body>
+<title>PQC Migration Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: control-room walkthrough. Top: scene title + controls, deadline timeline, step rail. Stage: animated estate canvas (left) beside three actor lanes (agents, quantum optimization, human gate). Below: the step's full briefing. */
+:root{
+  --bg:#F3F6F4; --surface:#FFFFFF; --surface-2:#E8EEEA; --ink:#0F1F1A; --muted:#51625B; --line:#D3DCD7;
+  --agent:#0B6A64; --agent-bg:#DDEFEC;
+  --human:#94570A; --human-bg:#FAEDD6;
+  --quantum:#5643C4; --quantum-bg:#EAE7FB;
+  --risk:#AE2A20; --risk-bg:#FBE8E5;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Public Sans","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1311; --surface:#131C19; --surface-2:#1A2521; --ink:#E2EBE6; --muted:#9BAEA6; --line:#283531;
+  --agent:#55C3B9; --agent-bg:#123129; --human:#E8AB4F; --human-bg:#33260F; --quantum:#AB9FF6; --quantum-bg:#242045; --risk:#F18C81; --risk-bg:#3A1814; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1311; --surface:#131C19; --surface-2:#1A2521; --ink:#E2EBE6; --muted:#9BAEA6; --line:#283531;
+  --agent:#55C3B9; --agent-bg:#123129; --human:#E8AB4F; --human-bg:#33260F; --quantum:#AB9FF6; --quantum-bg:#242045; --risk:#F18C81; --risk-bg:#3A1814; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.6 var(--f-body);padding-inline:16px;margin:0}
+.app{max-width:1260px;margin:0 auto;padding-block:20px 36px;display:grid;gap:14px}
+a{color:var(--agent)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--quantum);outline-offset:2px}
+h1,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+p{margin:0}
+.eyebrow{font:500 11.5px/1.3 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.chip{display:inline-block;font:500 10.5px/1 var(--f-mono);letter-spacing:.07em;text-transform:uppercase;padding:5px 7px;border-radius:6px;white-space:nowrap}
+.c-agent{background:var(--agent-bg);color:var(--agent)}
+.c-human{background:var(--human-bg);color:var(--human)}
+.c-q{background:var(--quantum-bg);color:var(--quantum)}
+.c-risk{background:var(--risk-bg);color:var(--risk)}
+.c-neutral{background:var(--surface-2);color:var(--muted)}
+
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.title{display:grid;gap:6px;min-width:0;flex:1 1 420px}
+.title h1{font-stretch:114%;font-weight:740;font-size:clamp(1.5rem,3.2vw,2.35rem);line-height:1.05;letter-spacing:-.015em}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ctrl button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 13px;cursor:pointer;font-weight:500;font-size:14px;display:inline-flex;gap:7px;align-items:center}
+.ctrl button:hover{border-color:var(--muted)}
+#play{position:relative;overflow:hidden;background:var(--ink);color:var(--bg);border-color:var(--ink);min-width:122px;justify-content:center}
+#play::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:calc(var(--p,0)*100%);background:var(--agent)}
+.kbd{font:500 11px var(--f-mono);color:var(--muted)}
+
+.tl{position:relative;height:92px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tl-in{position:absolute;left:18px;right:18px;top:0;bottom:0}
+.tl-track{position:absolute;left:0;right:0;top:58px;height:2px;background:var(--line)}
+.tl-yr{position:absolute;top:66px;transform:translateX(-50%);font:500 10.5px var(--f-mono);color:var(--muted)}
+.tl-tick{position:absolute;top:54px;width:1px;height:10px;background:var(--line)}
+.tl-m{position:absolute;top:53px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--quantum);border:2px solid var(--surface)}
+.tl-m.strong{background:var(--risk)}
+.tl-lab{position:absolute;font:500 10.5px/1.2 var(--f-mono);color:var(--muted);white-space:nowrap;transform:translateX(-50%)}
+.tl-lab.strong{color:var(--risk)}
+.tl-win{position:absolute;top:50px;height:18px;border-radius:9px;background:var(--agent-bg);border:1.5px solid var(--agent);transition:left .7s cubic-bezier(.2,.7,.2,1),width .7s cubic-bezier(.2,.7,.2,1),opacity .4s}
+.tl-today{position:absolute;top:40px;width:2px;height:28px;background:var(--ink)}
+.tl-today span{position:absolute;top:2px;right:6px;font:500 10px var(--f-mono);color:var(--ink)}
+
+.rail{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.rail button{flex:0 0 auto;min-width:40px;height:38px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font:500 13px var(--f-mono);position:relative;color:var(--muted)}
+.rail button.done{background:var(--surface-2);color:var(--ink)}
+.rail button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rail button.q::after{content:"";position:absolute;right:4px;top:4px;width:6px;height:6px;border-radius:50%;background:var(--quantum)}
+.rail .sep{flex:0 0 1px;background:var(--line);margin:4px 2px}
+
+.stage{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px;align-items:start}
+.estate{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;gap:10px}
+.cv-wrap{position:relative;height:clamp(330px,54vh,520px);border-radius:10px;background:var(--bg)}
+#estate{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cv-status{position:absolute;left:10px;top:10px;right:10px;display:flex;gap:8px;align-items:center;pointer-events:none}
+.cv-status span{font:500 11.5px var(--f-mono);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 8px;color:var(--ink);max-width:100%}
+.cv-note{position:absolute;right:10px;bottom:8px;font:500 10px var(--f-mono);color:var(--muted);pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);min-height:20px}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.sw{display:inline-block;width:11px;height:11px;flex:0 0 auto}
+.meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 14px}
+.m{display:grid;gap:4px}
+.m-top{display:flex;justify-content:space-between;gap:8px;font:500 11px var(--f-mono);color:var(--muted)}
+.m-top b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--agent);transition:width .25s linear}
+
+.lanes{display:grid;gap:12px}
+.lane{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 15px;display:grid;gap:8px;transition:opacity .4s}
+.lane-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lane-h strong{font-family:var(--f-display);font-stretch:108%;font-weight:680;font-size:1rem}
+.log{list-style:none;margin:0;padding:0;display:grid;gap:7px;min-height:128px;font-size:.86rem;align-content:start}
+.log li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;align-items:start}
+.log li .chip{justify-self:start;margin-top:1px;max-width:96px;overflow:hidden;text-overflow:ellipsis}
+.qmeta{display:grid;gap:3px;font-size:.84rem}
+.qmeta b{font-weight:600}
+.qmeta span{color:var(--muted)}
+.qwrap{position:relative;height:132px}
+#qcv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.qres{font:500 11.5px var(--f-mono);color:var(--quantum);min-height:16px}
+.lane.off .qres{color:var(--muted)}
+.lane.off .qwrap{opacity:.45}
+.gate-who{display:grid;gap:2px}
+.gate-who b{font-weight:600}
+.gate-who span{font-size:.86rem;color:var(--muted)}
+.gsteps{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:.84rem;min-height:52px}
+.gsteps li{display:flex;gap:8px;align-items:center;color:var(--muted)}
+.gsteps li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line);flex:0 0 auto}
+.gsteps li.wait::before{background:var(--human);animation:pulse 1.2s infinite}
+.gsteps li.ok{color:var(--ink)}
+.gsteps li.ok::before{background:var(--agent)}
+.gsteps li.bad{color:var(--risk)}
+.gsteps li.bad::before{background:var(--risk)}
+@keyframes pulse{50%{opacity:.25}}
+
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;display:grid;gap:16px}
+.what{font-size:1.06rem;max-width:80ch}
+.dg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.7fr);gap:16px}
+.dc{display:grid;gap:8px;align-content:start;font-size:.93rem}
+.dc h4,.dk h4{font:500 11px/1.2 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bn{background:var(--risk-bg);border-radius:12px;padding:14px}
+.bn h4{color:var(--risk)}
+.bn .chip{background:var(--surface);color:var(--risk)}
+.lead{font-family:var(--f-display);font-stretch:106%;font-weight:650;font-size:1.04rem;line-height:1.3}
+.roles{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:10px}
+.roles li{display:grid;grid-template-columns:100px minmax(0,1fr);gap:10px;align-items:start;font-size:.9rem}
+.roles li .chip{justify-self:start;margin-top:2px}
+.roles li.na{color:var(--muted)}
+.dk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;padding-top:14px;border-top:1px dashed var(--line);font-size:.92rem}
+.dk .done h4{color:var(--agent)}
+.dk .watch h4{color:var(--human)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat{background:var(--surface-2);border-radius:12px;padding:14px;display:grid;gap:6px;align-content:start}
+.stat b{font-family:var(--f-display);font-stretch:118%;font-weight:760;font-size:1.8rem;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.86rem;color:var(--muted)}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.cols h4{font:500 11px/1.2 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.cols ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:.9rem}
+.big{font-family:var(--f-display);font-stretch:112%;font-weight:720;font-size:clamp(1.25rem,2.4vw,1.7rem);line-height:1.15;max-width:34ch;text-wrap:balance}
+sup{font:500 9.5px var(--f-mono);color:var(--muted)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rv{animation:rise .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*85ms)}
+footer{font-size:.8rem;color:var(--muted);display:grid;gap:6px;padding-top:6px}
+.explain{display:grid;gap:12px;justify-items:center;padding-top:4px}
+#watchVideo{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:12px;padding:13px 20px;cursor:pointer;font-weight:600;font-size:15px;font-family:var(--f-display);font-stretch:108%;letter-spacing:.01em}
+#watchVideo:hover{background:var(--agent);border-color:var(--agent)}
+.player{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;gap:8px}
+.player video{width:100%;max-height:72vh;border-radius:10px;background:#000;display:block}
+.player p{font-size:.86rem;color:var(--muted)}
+footer ol{margin:0;padding-left:18px;display:grid;gap:2px;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}
+
+@media (max-width:1000px){
+  .stage{grid-template-columns:1fr}
+  .dg,.dk,.cols{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  footer ol{grid-template-columns:1fr}
+}
+@media (max-width:700px){
+  .tl-lab{display:none}
+  .tl{height:64px}
+  .tl-track{top:32px}.tl-tick{top:28px}.tl-m{top:27px}.tl-win{top:24px}.tl-yr{top:40px}.tl-today{top:16px}
+  .cv-wrap{height:320px}
+}
+@media (max-width:520px){
+  .meters{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats{grid-template-columns:1fr}
+  .roles li,.log li{grid-template-columns:1fr;gap:3px}
+  .detail{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){.rv{animation:none}.gsteps li.wait::before{animation:none}.tl-win{transition:none}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="title">
+      <p class="eyebrow" id="kick">Start &middot; Overview</p>
+      <h1 id="stitle" aria-live="polite">How the migration runs</h1>
+    </div>
+    <div class="ctrl">
+      <button type="button" id="prev" aria-label="Previous step">&larr; Back</button>
+      <button type="button" id="play" aria-label="Play the tour">&#9654; Play tour</button>
+      <button type="button" id="next" aria-label="Next step">Next &rarr;</button>
+      <button type="button" id="replay" aria-label="Replay this step">&#8635; Replay</button>
+    </div>
+  </header>
+
+  <div class="tl" id="tl" aria-label="Deadline timeline 2026 to 2035"><div class="tl-in" id="tlin">
+    <div class="tl-track"></div>
+    <div class="tl-win" id="tlwin"></div>
+  </div></div>
+
+  <nav class="rail" id="rail" aria-label="Steps"></nav>
+
+  <main class="stage">
+    <div class="estate">
+      <div class="cv-wrap">
+        <canvas id="estate" aria-label="Animated view of an illustrative organization's assets moving through the migration"></canvas>
+        <div class="cv-status"><span id="cvs">Illustrative estate &middot; 112 assets</span></div>
+        <div class="cv-note">Illustrative simulation, not measurements</div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="meters" id="meters"></div>
+    </div>
+
+    <aside class="lanes">
+      <section class="lane" id="laneA" aria-label="Agents">
+        <div class="lane-h"><strong>Agents</strong><span class="chip c-agent">Doing the work</span></div>
+        <ul class="log" id="log"></ul>
+      </section>
+      <section class="lane" id="laneQ" aria-label="Quantum optimization">
+        <div class="lane-h"><strong>Quantum optimization</strong><span class="chip c-q" id="qfit">Strong fit</span></div>
+        <div class="qmeta" id="qmeta"></div>
+        <div class="qwrap"><canvas id="qcv" aria-hidden="true"></canvas></div>
+        <p class="qres" id="qres"></p>
+      </section>
+      <section class="lane" id="laneH" aria-label="Human gate">
+        <div class="lane-h"><strong>Human gate</strong><span class="chip c-human" id="gcode">G1</span></div>
+        <div class="gate-who" id="gwho"></div>
+        <ol class="gsteps" id="gsteps"></ol>
+      </section>
+    </aside>
+  </main>
+
+  <section class="detail" id="detail" aria-live="polite"></section>
+
+  <footer>
+    <p>The estate, agent log and solver traces are an illustrative simulation of one organization with 112 assets. Deadlines and standards status reflect public sources as of October 2026.</p>
+    <ol>
+      <li><a href="https://postquantum.com/security-pqc/entrust-ponemon-pqc-report-2026/">Entrust/Ponemon 2026 post-quantum report; CA/B Forum SC081v3</a></li>
+      <li><a href="https://www.sectigo.com/root-causes/root-causes-522-how-prepared-are-enterprises-for-pqc-part-2">Sectigo State of Crypto Agility survey</a></li>
+      <li><a href="https://www.research.google/blog/safeguarding-cryptocurrency-by-disclosing-quantum-vulnerabilities-responsibly/">Google Quantum AI, ECDLP-256 estimates, March 2026</a></li>
+      <li><a href="https://blog.google/security/cultivating-a-robust-and-efficient-quantum-safe-https/">Chrome: Merkle Tree Certificates</a></li>
+      <li><a href="https://cointelegraph.com/news/quantum-computers-need-far-less-power-crack-crypto-says-google">Google sets a 2029 PQC deadline</a></li>
+      <li><a href="https://pqshield.com/nist-recommends-timelines-for-transitioning-cryptographic-algorithms/">NIST IR 8547 initial public draft</a></li>
+      <li><a href="https://pqshield.com/eu-pqc-workstream-publishes-a-coordinated-implementation-roadmap-for-the-transition-to-post-quantum-cryptography/">EU Coordinated Implementation Roadmap for PQC</a></li>
+      <li><a href="https://www.mccannfitzgerald.com/knowledge/data-privacy-and-cyber-risk/cyber-resilience-act-reporting-obligations-apply-from-11-september-2026">CRA reporting obligations from 11 September 2026</a></li>
+      <li><a href="https://www.encryptionconsulting.com/?p=93550">FIPS 140-3 backlog and FIPS 140-2 historical date</a></li>
+      <li><a href="https://www.rfc-editor.org/rfc/rfc9773.html">RFC 9773: ACME Renewal Information</a></li>
+      <li><a href="https://cyclonedx.org/news/cyclonedx-v1.7-released">CycloneDX 1.7 release</a></li>
+      <li><a href="https://www.frontiersin.org/articles/10.3389/fphy.2014.00005/full">Lucas (2014), Ising formulations of many NP problems</a></li>
+    </ol>
+  </footer>
+
+  <section class="explain" id="explain" aria-label="Explanation video">
+    <button type="button" id="watchVideo" aria-expanded="false" aria-controls="videoPanel">Watch the explanation video</button>
+    <div class="player" id="videoPanel" hidden>
+      <video id="explainVideo" controls playsinline preload="metadata" src="Agentic_PQC_Migration_Video.mp4">
+        Your browser cannot play this video. Download Agentic_PQC_Migration_Video.mp4 instead.
+      </video>
+      <p>Explanation of the agentic post-quantum migration walkthrough.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+var reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+var D=9000, AUTO=17000;
+
+/* ---------- scene data ---------- */
+var STEPS=[
+{n:1,title:`Governance, funding and skills`,phase:`Prepare`,when:`Now – Q1 2027`,win:[2026.78,2027.25],
+ what:`Set up the program: one accountable owner, a budget, a crypto policy and the people to run it.`,
+ issue:`PQC sits between security, IT, OT and procurement, so nobody owns it. The few crypto experts are already busy running PKI and HSMs.`,
+ bn:`About half of organizations report a PQC skills gap, and only 38% are actively preparing. Real cost estimates cause sticker shock.`,bt:`Internal`,
+ lead:`Turn the scarce experts into reviewers instead of laborers.`,
+ ag:`A program agent runs a quick scan and drafts the business case: regulatory exposure (EU roadmap, CRA, NIS2, DORA, NIST IR 8547), harvest-now-decrypt-later exposure and the cost of delay. It also drafts the crypto policy.`,
+ qt:null,qno:`Not needed at this step.`,
+ gate:{c:`G1`,who:`CISO and board`,d:`Approve policy, risk appetite and budget.`},
+ done:`A named owner, a multi-year budget line and an approved policy exist, in time for the EU's end-2026 first milestone.`,
+ watch:`The agent platform will see your weakest points. Give it its own security review and run it inside your environment before it touches anything.`,
+ log:[[`program`,`Quick scan started across the known estate`],[`program`,`Business case drafted: regulatory and HNDL exposure, cost of delay`],[`program`,`Crypto policy v0.1 drafted for review`],[`orchestrator`,`Policy and budget sent to Gate G1`]]},
+{n:2,title:`Discovery and CBOM`,phase:`Prepare`,when:`2026 – 2027`,win:[2026.78,2027.99],
+ what:`Find every use of cryptography and record it in a Cryptographic Bill of Materials.`,
+ issue:`Crypto hides in source code, compiled binaries, configs, appliances, vendor products and OT protocols. Inventories built by hand go stale within months.`,
+ bn:`Scanners miss binaries, firmware and OT traffic, and few vendors deliver a CBOM yet.`,bt:`Mixed`,
+ lead:`A discovery swarm that never stops scanning.`,
+ ag:`Deterministic scanners are the ground truth: source and binary analysis, active TLS/SSH/IPsec scans plus passive capture, PKI/HSM/KMS metadata connectors, config parsers and OT dissectors (Modbus, DNP3, OPC UA, IEC 61850). They write one CycloneDX CBOM (1.6, standardized as ECMA-424, or 1.7), refreshed in CI/CD. A document agent reads vendor datasheets only to fill gaps, and marks every inferred entry with a confidence score.`,
+ qt:null,qno:`Not needed: discovery is scanning, not optimization.`,
+ gate:{c:`G2`,who:`System owners`,d:`Attest completeness; review every low-confidence entry.`},
+ done:`Every in-scope system has an owner-attested CBOM entry, and the share of unknown or inferred entries is tracked and falling.`,
+ watch:`TLS 1.3 encrypts certificates, so passive capture shows the key-exchange group but not the certificate chain. Pair it with active scans. Store the CBOM like a crown-jewel secret.`,
+ log:[[`discovery`,`Active TLS, SSH and IPsec scans of reachable endpoints`],[`discovery`,`Binary and source analysis found crypto in libraries and firmware`],[`document`,`Gaps filled from vendor datasheets, each marked inferred`],[`discovery`,`CBOM written in CycloneDX and committed to CI/CD`]]},
+{n:3,title:`Risk and dependency map`,phase:`Prepare`,when:`2026 – 2027`,win:[2026.78,2027.99],
+ what:`Rank every asset by quantum risk and map what depends on what.`,
+ issue:`Thousands of findings and no order to work them in. Nobody knows which system can't move until its library, HSM, CA or partner moves first.`,
+ bn:`The threat clock keeps moving. Google's March 2026 estimate puts ECC-256 under 500,000 physical qubits, and Google moved its own deadline to 2029.`,bt:`External`,
+ lead:`Turn the CBOM into a graph and cut it into pieces that can move on their own.`,
+ ag:`A risk agent scores each asset with Mosca's inequality (data shelf-life, migration time, exposure) and the EU high/medium/low classes. Confidentiality comes first because of harvest-now-decrypt-later; signatures follow, except long-lived trust such as roots, firmware and signed records. Each item is tagged as controllable or externally gated.`,
+ qt:`Balanced graph partitioning, a standard Ising/QUBO formulation, splits the dependency graph into migration clusters with the fewest cross-cluster links, so each cluster moves independently with a hybrid bridge at the seams. At enterprise scale it runs by decomposition on quantum-inspired solvers, compared against Leiden on every run.`,
+ q:{model:`Balanced partitioning QUBO`,dec:`Migration clusters with the fewest cross-links`,base:`Leiden, METIS`,fit:`Moderate`,Ef:.24,Eb:.2},
+ gate:{c:`G2`,who:`Risk owners`,d:`Confirm every asset classified high-risk.`},
+ done:`Every high-risk asset has a cluster and a target date, and every external gate has a named person tracking it.`,
+ watch:`Mosca inputs are estimates. Re-run the scoring whenever a new quantum resource estimate or data-retention rule appears.`,
+ log:[[`risk`,`Every asset scored with Mosca's inequality`],[`risk`,`Classified high, medium and low per the EU roadmap`],[`risk`,`Externally gated items tagged: vendors, partners, browsers`],[`orchestrator`,`Dependency graph sent to the partitioning solver`]]},
+{n:4,title:`Target architecture and crypto-agility`,phase:`Prepare`,when:`2027`,win:[2027,2027.99],
+ what:`Choose algorithms and parameters for each context, and build the layer that lets you change them later.`,
+ issue:`Each link and device has different limits: packet size, CPU, latency, compliance regime. One global setting either breaks constrained devices or under-protects critical ones.`,
+ bn:`Standards are still moving. FN-DSA and HQC are drafts; composite certificates, Merkle Tree Certificates and PQC for JOSE/COSE are IETF drafts.`,bt:`External`,
+ lead:`Policy-as-code profiles, chosen per endpoint and swappable later.`,
+ ag:`An architecture agent reads each endpoint's constraints from the CBOM and proposes profiles from the standardized set: ML-KEM-768, or ML-KEM-1024 and ML-DSA-87 where CNSA 2.0 applies; ML-DSA-44 or 65 elsewhere; SLH-DSA or LMS/XMSS for firmware and long-lived roots. Hybrid is the default, as BSI and ANSSI recommend. The agility layer wraps vetted libraries, so a later move to FN-DSA or HQC is a policy change.`,
+ qt:null,qno:`Not needed: constraints already fix most choices, so a rules engine solves it.`,
+ gate:{c:`G3`,who:`Crypto architect`,d:`Approve the profile catalogue and policy.`},
+ done:`Every endpoint type maps to a profile, and the agility layer is proven by swapping one algorithm in the lab without code changes.`,
+ watch:`Never implement cryptography inside the agility layer. Wrap production libraries such as OpenSSL 3.5+, BoringSSL or AWS-LC; liboqs is meant for prototyping.`,
+ log:[[`architecture`,`Endpoint constraints read: MTU, CPU, latency, regime`],[`architecture`,`Profiles proposed: hybrid ML-KEM-768 default, CNSA 2.0 scope on ML-KEM-1024`],[`architecture`,`Agility-layer policy generated over OpenSSL 3.5+`],[`orchestrator`,`Profile catalogue sent to Gate G3`]]},
+{n:5,title:`Supply chain, HSMs and procurement`,phase:`Prepare`,when:`Now – 2028`,win:[2026.78,2028.99],
+ what:`Get vendors, HSMs and contracts ready, and stop buying quantum-vulnerable systems.`,
+ issue:`Most of the migration is vendor upgrades the organization doesn't control, tracked in emails and spreadsheets.`,
+ bn:`HSMs and KMS are the hardest blocker. PKCS#11 v3.2 defines ML-KEM and ML-DSA, but vendor support is uneven, cross-vendor key migration is painful, and FIPS 140-3 validation backlogs average over 500 days.`,bt:`External`,
+ lead:`Treat every vendor as a tracked dependency with a date.`,
+ ag:`A vendor agent tracks each supplier's PQC roadmap, NIST CAVP and CMVP status, and real PKCS#11 and KMIP support. It drafts contract clauses and RFP questions (roadmap dates, CBOM delivery, quantum-safe update path) and raises an alert when a slipped date threatens a wave. Each slip feeds the step 8 scheduler as a new constraint.`,
+ qt:null,qno:`No separate model: vendor dates become constraints for the step 8 scheduler.`,
+ gate:{c:`G4`,who:`Procurement and legal`,d:`Sign contracts and choose the HSM platform.`},
+ done:`Every critical vendor has a dated, contractual PQC commitment, and HSM PQC support is proven in your lab rather than on a datasheet.`,
+ watch:`Moving to another HSM vendor often means new keys and reissuing everything that depends on them. FIPS 140-2 certificates went historical in September 2026, so check ML-KEM and ML-DSA sit inside a FIPS 140-3 boundary.`,
+ log:[[`vendor`,`PQC roadmaps collected from critical suppliers`],[`vendor`,`CAVP/CMVP status and real PKCS#11 v3.2 support checked`],[`vendor`,`Contract clauses drafted: dates, CBOM delivery, update path`],[`vendor`,`Slipped vendor dates sent to the scheduler as constraints`]]},
+{n:6,title:`Certificate lifecycle automation`,phase:`Migrate`,when:`2026 – 2028`,win:[2026.78,2028.99],
+ what:`Automate issuing and renewing every certificate, internal ones included.`,
+ issue:`Many certificates are still renewed by hand, and expired certificates remain a common cause of outages.`,
+ bn:`Public TLS certificate validity falls to 200 days from March 2026, 100 days from March 2027 and 47 days from March 2029. Manual processes break before PQC does.`,bt:`Internal`,
+ lead:`Make an algorithm change just another re-issue.`,
+ ag:`A certificate agent finds every certificate, onboards it to ACME or the CLM platform and runs renewals within approved policy, domain validation included. Switching algorithms becomes a policy update that rolls out on the next renewal.`,
+ qt:null,qno:`Not needed: ACME Renewal Information (RFC 9773) already spreads renewal load.`,
+ gate:{c:`G3`,who:`PKI owner`,d:`Approve policy changes and any new trust anchor.`},
+ done:`Every public certificate renews without a person, and one algorithm change has been rolled out by policy in a test domain.`,
+ watch:`The 47-day rule covers publicly trusted TLS only. Private PKI sets its own lifetimes, so automate it anyway: it carries the PQC switch.`,
+ log:[[`certificate`,`Every public and private certificate found`],[`certificate`,`Renewals onboarded to ACME with ARI windows`],[`certificate`,`Domain validation automated for short lifetimes`],[`certificate`,`Test-domain algorithm switch completed by policy`]]},
+{n:7,title:`Lab testing and pilots`,phase:`Migrate`,when:`2027`,win:[2027,2027.99],
+ what:`Find what breaks before it reaches production.`,
+ issue:`Larger keys and signatures break things nobody predicted: buffers, MTU limits, constrained devices, old client libraries.`,
+ bn:`An ML-KEM key share adds over a kilobyte to the TLS ClientHello, which can split it across packets and break middleboxes. New implementations can also leak through timing side channels.`,bt:`Mixed`,
+ lead:`A digital-twin lab built from the CBOM.`,
+ ag:`A test agent reproduces real network paths, generates the test matrix (handshake size, MTU, IKEv2 fragmentation, tail latency, partner interop), runs fuzzing and constant-time checks, and files each failure with the exact path that broke.`,
+ qt:`For large matrices, choosing the smallest test set that still covers every combination of stack, device, path and profile is a set-cover QUBO. Small matrices use standard pairwise tools.`,
+ q:{model:`Set-cover QUBO`,dec:`Smallest test set covering every combination`,base:`Pairwise tools, greedy set cover`,fit:`Moderate`,Ef:.25,Eb:.21},
+ gate:{c:`G5`,who:`Engineering leads`,d:`Go or no-go for each pilot.`},
+ done:`Every profile passes on every path class in the lab, and production pilots have run with a tested rollback.`,
+ watch:`Measure p99 latency, not averages. Constrained devices fail at the tail.`,
+ log:[[`test`,`Digital twin of real network paths built`],[`test`,`Handshake size, MTU and p99 latency tests running`],[`test`,`3 failures: a middlebox drops the larger ClientHello`],[`remediation`,`Fix validated, rollback tested, pilots ready`]]},
+{n:8,title:`Wave 1: key exchange`,phase:`Migrate`,when:`2027 – 2029`,win:[2027,2029.99],flag:true,
+ what:`Switch connections to hybrid key exchange first, to stop harvest-now-decrypt-later.`,
+ issue:`Traffic recorded today can be decrypted later. Every month of delay adds to the exposed archive.`,
+ bn:`Both ends of a connection must upgrade, so partners and legacy appliances set the pace.`,bt:`External`,
+ lead:`Thousands of small changes, scheduled optimally and rolled out safely.`,
+ ag:`A remediation agent opens config changes and pull requests (X25519MLKEM768 in TLS 1.3, mlkem768x25519-sha256 in SSH, additional key exchanges in IKEv2 per RFC 9370) and runs canary rollouts with automatic rollback. A partner agent tracks each counterparty's readiness.`,
+ qt:`Wave scheduling assigns every change to a maintenance window under dependencies, team capacity, change freezes, vendor dates and risk-weighted deadlines. Real instances exceed 100,000 binary variables, so they are decomposed and solved with quantum-inspired and hybrid solvers, with a CP-SAT baseline run in parallel. The better plan wins.`,
+ q:{model:`Constrained scheduling QUBO`,dec:`Which change goes in which maintenance window`,base:`CP-SAT`,fit:`Strong`,Ef:.17,Eb:.26},
+ gate:{c:`G5`,who:`Change board`,d:`Approve each wave; sign off high-risk systems.`},
+ done:`Live traffic shows every high-risk confidentiality link negotiating hybrid key exchange.`,
+ watch:`Hybrid protects new sessions only. Legacy clients still fall back to classical, and secrets that already crossed old links stay exposed, so rotate long-lived ones.`,
+ log:[[`remediation`,`Changes opened: X25519MLKEM768 on TLS 1.3 endpoints`],[`remediation`,`mlkem768x25519-sha256 enabled for SSH`],[`partner`,`Counterparty readiness tracked; 2 partners lagging`],[`remediation`,`Canary rollout per wave, automatic rollback armed`]]},
+{n:9,title:`Wave 2: private PKI and signing`,phase:`Migrate`,when:`2028 – 2030`,win:[2028,2030.99],
+ what:`Move your own certificate authorities, code signing and firmware signing to post-quantum signatures.`,
+ issue:`Every client, device and service that trusts your CA must receive the new trust anchor before you can rely on it.`,
+ bn:`Trust-store distribution takes years, HSM support for ML-DSA keys is recent, and legacy software can't parse the new certificates.`,bt:`Mixed`,
+ lead:`Agents prepare everything; people perform the ceremonies.`,
+ ag:`An agent maps every relying party, plans the trust-anchor rollout, and generates composite or parallel chain configurations and signing-pipeline changes.`,
+ qt:`The order of trust-anchor rollout across relying parties is solved with the step 8 scheduler.`,
+ q:{model:`Scheduling QUBO (step 8 model)`,dec:`Trust-anchor rollout order across relying parties`,base:`CP-SAT`,fit:`Strong`,Ef:.18,Eb:.25},
+ gate:{c:`G6`,who:`Key custodians, two-person rule`,d:`Perform the root ceremony. Agents never touch private keys.`},
+ done:`The new trust anchors are present on every relying party before the first post-quantum-only certificate is issued.`,
+ watch:`LMS and XMSS are stateful: reusing a one-time key breaks security. NIST SP 800-208 requires key generation and signing inside hardware modules, and state must never be restored from backup.`,
+ log:[[`pki`,`Every relying party of the private CA mapped`],[`pki`,`Trust-anchor distribution planned before first issuance`],[`pki`,`Composite chain configs and signing-pipeline changes generated`],[`orchestrator`,`Root ceremony scheduled: people only, two-person rule`]]},
+{n:10,title:`Product track: EU Cyber Resilience Act`,phase:`Migrate`,when:`Now – Dec 2027`,win:[2026.78,2027.95],
+ what:`Keep every product you sell in the EU compliant, with an update path that can change its cryptography.`,
+ issue:`Products designed in 2026 will still be in the field in 2035, often with cryptography fixed in hardware.`,
+ bn:`Boot ROMs and secure elements can't be changed after shipping. Most CRA obligations, including CE marking, apply from 11 December 2027.`,bt:`Internal`,
+ lead:`Compliance built from the same CBOM.`,
+ ag:`A product compliance agent maps each product's SBOM and CBOM to CRA requirements (state-of-the-art cryptography, secure updates, vulnerability handling) and to the EU roadmap's expectation of quantum-safe upgrades. It flags designs without post-quantum signature verification in the boot chain and drafts the technical documentation.`,
+ qt:null,qno:`Not needed at this step.`,
+ gate:{c:`G4`,who:`Product security officer`,d:`Sign the declaration of conformity.`},
+ done:`Each product has a CBOM, an algorithm-update mechanism tested end to end, and a chosen conformity-assessment route.`,
+ watch:`CRA reporting already applies since 11 September 2026: actively exploited vulnerabilities and severe incidents need an early warning within 24 hours.`,
+ log:[[`product`,`Product SBOM and CBOM mapped to CRA requirements`],[`product`,`Designs without PQ signature check in boot chain flagged`],[`product`,`Technical documentation drafted`],[`product`,`Reporting playbook armed: 24-hour early warning`]]},
+{n:11,title:`Identity, applications and the public web`,phase:`Migrate`,when:`2027 – 2031`,win:[2027,2031.99],
+ what:`Migrate the layers above the network: tokens, single sign-on, email signing and public HTTPS.`,
+ issue:`JWT, OAuth, SAML, Kerberos, S/MIME and FIDO each carry their own cryptography, often deep in application code.`,
+ bn:`As of late 2026 no publicly trusted post-quantum certificate exists. Chrome is building a quantum-resistant root store on Merkle Tree Certificates for Q3 2027; identity providers and DNSSEC lag behind.`,bt:`External`,
+ lead:`Be ready on release day.`,
+ ag:`A refactoring agent moves application crypto calls behind the agility layer. A watchtower agent follows IETF PLANTS, the Chrome root program and identity vendors, and pre-stages each switch so it ships the day support lands.`,
+ qt:null,qno:`Not needed at this step.`,
+ gate:{c:`G5`,who:`Identity architects`,d:`Approve every change to sign-in flows.`},
+ done:`Application crypto goes through the agility layer, and each identity provider has a dated PQC roadmap.`,
+ watch:`Short-lived tokens face no harvest-now risk, so they can follow wave 1. Long-lived signatures, such as signed documents and code, cannot wait.`,
+ log:[[`refactor`,`App crypto calls moved behind the agility layer`],[`watchtower`,`Following IETF PLANTS and the Chrome root program`],[`watchtower`,`Identity provider PQC roadmaps tracked`],[`watchtower`,`Public-web switch pre-staged for MTC availability`]]},
+{n:12,title:`Data at rest, OT and the long tail`,phase:`Migrate`,when:`2029 – 2035`,win:[2029,2035],
+ what:`Re-protect stored data and deal with devices that can't be upgraded.`,
+ issue:`Archives sit behind keys wrapped or transported with RSA or ECDH. Industrial controllers, medical devices, meters and vehicles run for 15 to 30 years.`,
+ bn:`Vendor-controlled firmware and real-time control traffic with tight latency budgets mean many devices get replaced, not patched.`,bt:`External`,
+ lead:`Shield what can't change; replace it on schedule.`,
+ ag:`An agent plans key re-wrapping jobs, flags data that needs full re-encryption, and keeps the list of non-upgradable devices with their replacement dates.`,
+ qt:`Choosing where to put post-quantum gateways and segmentation points is a facility-location and set-cover QUBO: cover every non-upgradable device with the fewest gateways inside the latency budget of control traffic. Replacement timing joins the wave scheduler.`,
+ q:{model:`Facility-location QUBO`,dec:`Fewest gateways covering every non-upgradable device`,base:`MILP`,fit:`Strong`,Ef:.16,Eb:.24},
+ gate:{c:`G5`,who:`OT engineers`,d:`Approve every change on control networks. Safety first.`},
+ done:`Every long-lived archive has quantum-safe key protection, and every non-upgradable device is shielded or has a funded replacement date.`,
+ watch:`Symmetric encryption survives; the exposure is the key exchange. Re-wrapping is enough unless wrapped keys could have been harvested in transit. Build gateways redundant.`,
+ log:[[`data`,`Key re-wrapping planned for long-lived archives`],[`data`,`Archives needing full re-encryption flagged`],[`ot`,`Non-upgradable devices listed with replacement dates`],[`orchestrator`,`Gateway placement sent to the facility-location solver`]]},
+{n:13,title:`Verify, decommission and enforce`,phase:`Sustain`,when:`2030 – 2035`,win:[2030,2035],
+ what:`Prove the migration is complete and switch off the old algorithms.`,
+ issue:`Classical fallbacks stay enabled in configs long after migration and allow downgrade attacks. Auditors and supervisors ask for proof.`,
+ bn:`Proving completeness is often harder than the migration itself.`,bt:`Internal`,
+ lead:`Continuous verification and audit-ready evidence.`,
+ ag:`A verification agent watches live traffic for classical-only handshakes and downgrades, and compiles evidence packs mapped to the EU roadmap, NIST IR 8547, NIS2 and DORA.`,
+ qt:null,qno:`Not needed: verification is measurement.`,
+ gate:{c:`G6`,who:`System owners, two-person rule`,d:`Approve switching off classical algorithms.`},
+ done:`No classical-only handshake appears on high-risk systems for a full audit period, with evidence to show it.`,
+ watch:`Switching off fallbacks breaks forgotten clients. Announce it, stage it, and keep a time-boxed exception process.`,
+ log:[[`verification`,`Live traffic watched for classical-only handshakes`],[`verification`,`Fallbacks found on 4 assets, tickets opened`],[`compliance`,`Evidence packs mapped to EU roadmap, NIST IR 8547, NIS2, DORA`],[`orchestrator`,`Decommission request sent to Gate G6`]]},
+{n:14,title:`Sustain and respond`,phase:`Sustain`,when:`Ongoing`,win:[2026.78,2035.4],
+ what:`Stay ready for the next change in cryptography.`,
+ issue:`If a PQC algorithm is broken or a cryptographically relevant quantum computer arrives early, most organizations would face a second multi-year migration.`,
+ bn:`Almost no organization has a crypto incident playbook or can rotate an algorithm fleet-wide.`,bt:`Internal`,
+ lead:`Re-plan in hours and rotate in weeks.`,
+ ag:`A watchtower agent tracks NIST, IETF, ENISA, BSI and ANSSI, CVEs, cryptanalysis papers and new quantum resource estimates, and opens an incident when a trigger fires.`,
+ qt:`The wave scheduler warm-starts from the current plan and produces an emergency rotation plan in hours, for example a move from ML-KEM to HQC once HQC is standardized.`,
+ q:{model:`Warm-started scheduling QUBO`,dec:`Emergency rotation plan in hours`,base:`Heuristics`,fit:`Strong`,Ef:.17,Eb:.27},
+ gate:{c:`G7`,who:`CISO`,d:`Declare the incident and approve the emergency rotation.`},
+ done:`A full algorithm-rotation drill finishes inside the target window, at least once a year.`,
+ watch:`Agility you never exercise doesn't exist. Drill it.`,
+ log:[[`watchtower`,`Trigger: new cryptanalysis result on a deployed algorithm`],[`orchestrator`,`Crypto incident opened; Gate G7 notified`],[`orchestrator`,`Scheduler warm-started from the current plan`],[`remediation`,`Emergency rotation rolling out by wave`]]}
+];
+var INTRO={n:0,title:`How the migration runs`,kick:`Start · Overview`,
+ log:[[`orchestrator`,`Program loaded: 14 steps, 7 human gates`],[`orchestrator`,`Agents ready: discovery, risk, vendor, remediation and more`],[`orchestrator`,`Solvers ready: QUBO models with classical baselines`],[`orchestrator`,`Press Play tour, or use the arrow keys`]],
+ qno:`Used in 6 of 14 steps (3, 7, 8, 9, 12, 14), always benchmarked against a classical solver.`,
+ gate:{c:`G1–G7`,who:`Named people`,d:`Approve every irreversible, legally binding or safety-critical action.`}};
+var FINAL={n:15,title:`Result: quantum-safe, verified and agile`,kick:`Result`,win:[2026.78,2031],
+ log:[[`verification`,`High-risk links verified on hybrid key exchange`],[`compliance`,`Final evidence pack mapped to EU roadmap, NIST IR 8547, NIS2, DORA`],[`watchtower`,`Monitoring continues: NIST, IETF, ENISA, CVEs`],[`orchestrator`,`Annual algorithm-rotation drill scheduled`]],
+ qno:`Five problem types solved; a classical baseline ran on every instance and the better plan was kept.`,
+ gate:{c:`G1–G7`,who:`All gates signed`,d:`Every critical step has a named, accountable approver.`}};
+var SCENES=[INTRO].concat(STEPS).concat([FINAL]);
+
+var GS={def:[[0,`Waiting for approval`,`wait`],[.72,`Approved`,`ok`]],
+ G6:[[0,`Waiting for 2 approvers`,`wait`],[.6,`Approver 1 signed`,`ok`],[.8,`Approver 2 signed: approved`,`ok`]],
+ G7:[[0,`Monitoring`,`ok`],[.22,`Incident declared`,`bad`],[.45,`Emergency rotation approved`,`ok`]],
+ intro:[[0,`7 gates in the plan`,`ok`],[.3,`Agents propose; people decide`,`ok`]],
+ final:[[.05,`G1 Policy`,`ok`],[.15,`G2 Inventory and risk`,`ok`],[.25,`G3 Architecture`,`ok`],[.35,`G4 Contracts and conformity`,`ok`],[.45,`G5 Production changes`,`ok`],[.55,`G6 Irreversible trust actions`,`ok`],[.65,`G7 Incident readiness`,`ok`]]};
+
+var STATUS=[`Illustrative estate · 112 assets`,`Unknown estate: only a few assets are known`,`Scanning: building the CBOM`,`Scoring risk and clustering dependencies`,`Assigning profiles behind the agility layer`,`Vendor-gated assets wait for suppliers`,`Certificates renewing automatically`,`Lab twin: testing paths and profiles`,`Wave rollout: hybrid key exchange`,`Trust anchors propagating from the PKI`,`Products brought into CRA compliance`,`Apps behind the agility layer; public web waits for MTC`,`Gateways shield non-upgradable OT devices`,`Verification sweep: hunting classical fallbacks`,`Crypto incident: re-plan and rotate`,`Quantum-safe, verified and agile`];
+
+/* ---------- colors ---------- */
+var C={};
+function readColors(){var cs=getComputedStyle(document.documentElement);var m={ink:'--ink',muted:'--muted',line:'--line',agent:'--agent',human:'--human',quantum:'--quantum',risk:'--risk',surface:'--surface',surface2:'--surface-2',bg:'--bg'};for(var k in m){C[k]=(cs.getPropertyValue(m[k])||'').trim()||'#888888';}}
+function A(h,a){h=h.replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];var n=parseInt(h,16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
+function clamp(x,a,b){return x<a?a:x>b?b:x}
+function ease(x){x=clamp(x,0,1);return x*x*(3-2*x)}
+function lerp(a,b,t){return a+(b-a)*t}
+readColors();
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readColors);}catch(e){}
+try{new MutationObserver(readColors).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});}catch(e){}
+
+/* ---------- estate model ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var R=mulberry32(20261011),R2=mulberry32(99);
+function gauss(){var u=0,v=0;while(u===0)u=R();v=R();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+var CL=[
+ {id:'Cluster A',x:.19,y:.27,n:20,t:'it',pri:.10,sx:.06,sy:.075},
+ {id:'Cluster B',x:.46,y:.21,n:20,t:'it',pri:.40,sx:.06,sy:.07},
+ {id:'Cluster C',x:.74,y:.25,n:18,t:'it',pri:.25,sx:.055,sy:.075},
+ {id:'Cluster D',x:.27,y:.70,n:20,t:'it',pri:.62,sx:.06,sy:.07},
+ {id:'PKI',x:.52,y:.49,n:4,t:'ca',pri:0,sx:.025,sy:.035},
+ {id:'OT',x:.80,y:.67,n:16,t:'ot',pri:1,sx:.05,sy:.065},
+ {id:'Products',x:.54,y:.87,n:8,t:'prod',pri:1,sx:.05,sy:.025}
+];
+var N=[];
+function mk(t,ci,hx,hy){var sx=.08+R()*.84,sy=.12+R()*.78;var ang=Math.atan2(sy-.5,sx-.5);var disc=(((ang+Math.PI/2)%(2*Math.PI))+2*Math.PI)%(2*Math.PI)/(2*Math.PI);return{t:t,c:ci,hx:hx,hy:hy,sx:sx,sy:sy,disc:disc,r:R(),w2:R()};}
+CL.forEach(function(c,ci){for(var i=0;i<c.n;i++){N.push(mk(c.t,ci,clamp(c.x+gauss()*c.sx,.1,.95),clamp(c.y+gauss()*c.sy,.1,.95)));}});
+for(var p=0;p<6;p++)N.push(mk('partner',-1,.035,.17+p*.13));
+var prodIdx=0,partIdx=0,labCount=0;
+N.forEach(function(n,i){
+ n.i=i;n.known=R()<.2;n.inferred=n.t!=='partner'&&R()<.13;
+ var r=R();n.risk=n.t==='ot'?(r<.8?2:1):n.t==='ca'?2:(n.t==='prod'||n.t==='partner')?1:(r<.3?2:r<.7?1:0);
+ n.gated=n.t==='it'&&R()<.22;n.unlockAt=.35+R()*1.2;
+ n.cert=(n.t==='it'||n.t==='ca'||n.t==='prod')&&R()<.6;
+ n.app=n.t==='it'&&R()<.28;
+ var pri=n.t==='partner'?.75:n.t==='ca'?.05:(n.c>=0?CL[n.c].pri:.5);
+ n.wave=clamp(pri*.72+R()*.26,0,.97);
+ if(n.t==='prod'){n.ord=prodIdx/8;prodIdx++;}
+ if(n.t==='partner'){n.lag=(partIdx===1||partIdx===4);partIdx++;}
+ if(n.t==='it'&&n.c===1&&labCount<8){n.lab=true;n.labFail=(labCount===1||labCount===4||labCount===6);labCount++;}
+});
+var webCount=0;N.forEach(function(n){if(n.app&&(n.c===1||n.c===2)&&webCount<5){n.web=true;webCount++;}});
+var itIdx=N.filter(function(n){return n.t==='it';}).map(function(n){return n.i;});
+var fb=0;while(fb<4){var k=itIdx[Math.floor(R()*itIdx.length)];if(!N[k].fb){N[k].fb=true;fb++;}}
+var CA=N.filter(function(n){return n.t==='ca';});
+var maxCa=0;N.forEach(function(n){if(n.t==='it'){var best=9,bi=0;CA.forEach(function(c){var d=Math.hypot((n.hx-c.hx)*1.5,n.hy-c.hy);if(d<best){best=d;bi=c.i;}});n.caD=best;n.ca=bi;if(best>maxCa)maxCa=best;}});
+N.forEach(function(n){if(n.t==='it')n.caD=.06+.9*n.caD/maxCa;});
+var GW=[{x:.745,y:.6},{x:.865,y:.63},{x:.8,y:.79}];
+var maxG=0;N.forEach(function(n){if(n.t==='ot'){var best=9,bi=0;GW.forEach(function(g,gi){var d=Math.hypot(n.hx-g.x,n.hy-g.y);if(d<best){best=d;bi=gi;}});n.g=bi;n.gd=best;if(best>maxG)maxG=best;}});
+N.forEach(function(n){if(n.t==='ot')n.gdn=n.gd/maxG;});
+var E=[],ek={};
+function addE(a,b,k){if(a===b)return;var key=a<b?a+'-'+b:b+'-'+a;if(ek[key])return;ek[key]=1;E.push({a:a,b:b,k:k||'n',ph:R()});}
+CL.forEach(function(c,ci){var ids=N.filter(function(n){return n.c===ci;}).map(function(n){return n.i;});ids.forEach(function(i){var ds=ids.filter(function(j){return j!==i;}).map(function(j){return{j:j,d:Math.hypot(N[i].hx-N[j].hx,N[i].hy-N[j].hy)};}).sort(function(a,b){return a.d-b.d;});for(var q=0;q<Math.min(2,ds.length);q++)addE(i,ds[q].j);});});
+function pick(f){var a=N.filter(f);return a[Math.floor(R()*a.length)].i;}
+for(var x=0;x<14;x++){var a=pick(function(n){return n.t==='it';}),b=pick(function(n){return n.t==='it';});if(N[a].c!==N[b].c)addE(a,b);}
+for(x=0;x<2;x++)addE(pick(function(n){return n.t==='ot';}),pick(function(n){return n.c===2;}));
+CA.forEach(function(c){for(var q=0;q<3;q++)addE(c.i,pick(function(n){return n.t==='it';}),'trust');});
+N.forEach(function(n){if(n.t==='partner')addE(n.i,pick(function(m){return m.c===0||m.c===3;}));});
+addE(pick(function(n){return n.t==='prod';}),CA[0].i);
+var QM=[];for(var i=0;i<16;i++){QM[i]=[];for(var j=0;j<16;j++){QM[i][j]=j<i?QM[j][i]:(i===j?-(.3+R()*.7):(R()<.45?(R()*2-1)*(1-Math.abs(i-j)/18):0));}}
+var spins=[];for(i=0;i<16;i++)spins.push(R()<.5);
+
+/* ---------- canvas ---------- */
+var cv=document.getElementById('estate'),ctx=cv.getContext('2d'),W=0,H=0,PAD=22;
+var qc=document.getElementById('qcv'),qx=qc.getContext('2d'),QW=0,QH=0;
+function resize(){var dpr=Math.min(window.devicePixelRatio||1,2);var r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=Math.max(1,Math.round(W*dpr));cv.height=Math.max(1,Math.round(H*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);var q=qc.getBoundingClientRect();QW=q.width;QH=q.height;qc.width=Math.max(1,Math.round(QW*dpr));qc.height=Math.max(1,Math.round(QH*dpr));qx.setTransform(dpr,0,0,dpr,0,0);}
+try{var ro=new ResizeObserver(resize);ro.observe(cv.parentElement);ro.observe(qc.parentElement);}catch(e){window.addEventListener('resize',resize);}
+resize();
+function X(v){return PAD+v*(W-2*PAD)}function Y(v){return PAD+30+v*(H-2*PAD-30)}
+var MONO='"JetBrains Mono", ui-monospace, monospace';
+function shape(t,x,y,r){ctx.beginPath();if(t==='partner')ctx.rect(x-r,y-r,2*r,2*r);else if(t==='ot'){ctx.moveTo(x,y-r*1.25);ctx.lineTo(x+r*1.15,y+r*.85);ctx.lineTo(x-r*1.15,y+r*.85);ctx.closePath();}else if(t==='ca'){ctx.moveTo(x,y-r*1.3);ctx.lineTo(x+r*1.3,y);ctx.lineTo(x,y+r*1.3);ctx.lineTo(x-r*1.3,y);ctx.closePath();}else if(t==='prod'){rr(x-r,y-r,2*r,2*r,r*.45);}else ctx.arc(x,y,r,0,Math.PI*2);}
+function rr(x,y,w,h,r){ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function ring(x,y,r,col,lw,dash){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw||1.3;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();ctx.restore();}
+function label(txt,x,y,col,align){ctx.save();ctx.font='500 10.5px '+MONO;ctx.fillStyle=col;ctx.textAlign=align||'left';ctx.fillText(txt,x,y);ctx.restore();}
+function lockIcon(x,y,s){ctx.save();ctx.strokeStyle=C.human;ctx.fillStyle=C.human;ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(x,y-s*.3,s*.36,Math.PI,0);ctx.stroke();ctx.fillRect(x-s*.48,y-s*.3,s*.96,s*.72);ctx.restore();}
+function clockIcon(x,y,s){ctx.save();ctx.strokeStyle=C.human;ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(x,y,s,0,Math.PI*2);ctx.moveTo(x,y);ctx.lineTo(x,y-s*.7);ctx.moveTo(x,y);ctx.lineTo(x+s*.55,y);ctx.stroke();ctx.restore();}
+function xIcon(x,y,s){ctx.save();ctx.strokeStyle=C.risk;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-s,y-s);ctx.lineTo(x+s,y+s);ctx.moveTo(x+s,y-s);ctx.lineTo(x-s,y+s);ctx.stroke();ctx.restore();}
+function checkIcon(x,y,s){ctx.save();ctx.strokeStyle=C.agent;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-s,y);ctx.lineTo(x-s*.25,y+s*.75);ctx.lineTo(x+s,y-s*.8);ctx.stroke();ctx.restore();}
+function riskFill(k,a){return k===2?A(C.risk,.9*a):k===1?A(C.human,.9*a):A(C.ink,.42*a);}
+
+function drawEstate(s,t,now){
+ ctx.clearRect(0,0,W,H);
+ var rs=Math.max(3.2,Math.min(W,H)/100);
+ var e3=s===3?ease(t/.55):(s>3?1:0);
+ var riskA=s<3?0:(s===3?ease((t-.3)/.4):1);
+ if(s===15)riskA=1;
+ var cnt={cbom:0,kex:0,kexE:0,sig:0,sigE:0,ot:0,otE:0,prod:0,prodE:0,ver:0};
+ var cx=W/2,cy=H/2,maxR=Math.hypot(W/2,H/2);
+ /* state */
+ N.forEach(function(n){
+  n.vis=(s<=1)?(n.known?1:0):(s===2?(n.disc<=t*1.04?1:0):1);
+  var nx=s<3?n.sx:(s===3?lerp(n.sx,n.hx,e3):n.hx),ny=s<3?n.sy:(s===3?lerp(n.sy,n.hy,e3):n.hy);
+  n.px=X(nx);n.py=Y(ny);
+  var k=0;
+  if(n.t==='it'||n.t==='ca'||n.t==='partner'){
+   if(s===15)k=1;else if(s<8)k=0;else if(n.lag&&s<13)k=0;else if(n.lag&&s===13)k=t>.5?1:0;else if(s===8)k=n.wave<=t*1.04?1:0;else k=1;
+   n.hit=false;
+   if(s===14){var dd=Math.hypot(n.px-cx,n.py-cy)/maxR;n.hitAt=.12+.22*dd;n.fixAt=.5+.42*n.w2;if(t>=n.hitAt&&t<n.fixAt){k=0;n.hit=true;}}
+   cnt.kexE++;cnt.kex+=k;
+  }
+  n.kex=k;
+  n.sig=0;if(n.t==='it'||n.t==='ca'){n.sig=(s===15||s>9)?1:(s===9?(n.t==='ca'||t*1.12>=n.caD?1:0):0);cnt.sigE++;cnt.sig+=n.sig;}
+  n.pok=0;if(n.t==='prod'){n.pok=(s===15||s>10)?1:(s===10?(t>=.12+n.ord*.7?1:0):0);cnt.prodE++;cnt.prod+=n.pok;}
+  n.sh=0;if(n.t==='ot'){n.sh=(s===15||s>12)?1:(s===12?(ease((t-.3)/.5)>=n.gdn*.98+.01?1:0):0);cnt.otE++;cnt.ot+=n.sh;}
+  n.ver=(s===15||s===14)?1:(s===13?(n.hx<=t*1.06?1:0):0);cnt.ver+=n.ver;
+  cnt.cbom+=n.vis;
+ });
+ /* background dots */
+ ctx.fillStyle=A(C.muted,.12);
+ for(var gx=PAD;gx<W;gx+=26)for(var gy=PAD;gy<H;gy+=26)ctx.fillRect(gx,gy,1.2,1.2);
+ /* step 1 label */
+ if(s<=1){ctx.save();ctx.font='600 15px '+MONO;ctx.fillStyle=A(C.muted,.6);ctx.textAlign='center';ctx.fillText(s===0?'One organization, 112 assets':'Most of the estate is still unknown',W/2,H/2+4);ctx.restore();}
+ /* hulls */
+ if(s>=3){var ha=s===3?ease((t-.45)/.4):1;
+  CL.forEach(function(c){if(c.t==='prod')return;var hx=X(c.x),hy=Y(c.y),rx=c.sx*2.7*(W-2*PAD)+10,ry=c.sy*2.7*(H-2*PAD-30)+10;ctx.save();ctx.setLineDash([4,5]);ctx.strokeStyle=A(C.muted,.4*ha);ctx.beginPath();ctx.ellipse(hx,hy,rx,ry,0,0,Math.PI*2);ctx.stroke();ctx.restore();label(c.id,hx-rx*.62,hy-ry-4,A(C.muted,.9*ha));});
+  var pr=N.filter(function(n){return n.t==='prod';});var x0=Math.min.apply(null,pr.map(function(n){return n.px;}))-12,x1=Math.max.apply(null,pr.map(function(n){return n.px;}))+12,y0=Math.min.apply(null,pr.map(function(n){return n.py;}))-12,y1=Math.max.apply(null,pr.map(function(n){return n.py;}))+12;
+  ctx.save();ctx.setLineDash([4,5]);ctx.strokeStyle=s===10?A(C.agent,.85):A(C.muted,.4);ctx.lineWidth=s===10?1.6:1;ctx.beginPath();rr(x0,y0,x1-x0,y1-y0,8);ctx.stroke();ctx.restore();
+  label(s===10?'Products sold in the EU':'Products',x0,y0-5,s===10?C.agent:A(C.muted,.9));
+  label('Partners',X(.035)-6,Y(.17)-14,A(C.muted,.9));
+ }
+ /* agility layer */
+ if(s===4){var la=ease((t-.5)/.3);ctx.save();ctx.setLineDash([6,5]);ctx.strokeStyle=A(C.agent,.7*la);ctx.lineWidth=1.5;ctx.beginPath();rr(8,30,W-16,H-40,12);ctx.stroke();ctx.restore();label('Agility layer: policy-as-code over vetted libraries',16,H-16,A(C.agent,la));}
+ /* edges */
+ ctx.lineWidth=1;
+ E.forEach(function(ed){var a=N[ed.a],b=N[ed.b];if(!a.vis||!b.vis)return;var both=a.kex&&b.kex;ctx.strokeStyle=both?A(C.agent,.42):A(C.muted,s<=2?.13:.22);ctx.beginPath();ctx.moveTo(a.px,a.py);ctx.lineTo(b.px,b.py);ctx.stroke();});
+ /* lab pulses */
+ if(s===7){E.forEach(function(ed){var a=N[ed.a],b=N[ed.b];if(!(a.lab&&b.lab))return;var ph=reduce?.5:((now/1500)+ed.ph)%1;ctx.fillStyle=C.agent;ctx.beginPath();ctx.arc(lerp(a.px,b.px,ph),lerp(a.py,b.py,ph),2.4,0,Math.PI*2);ctx.fill();});}
+ /* trust particles */
+ if(s===9){N.forEach(function(n){if(n.t!=='it')return;var st=n.caD-.13,pp=(t*1.12-st)/.13;if(pp>0&&pp<1){var c=N[n.ca];ctx.strokeStyle=A(C.agent,.18);ctx.beginPath();ctx.moveTo(c.px,c.py);ctx.lineTo(n.px,n.py);ctx.stroke();ctx.fillStyle=C.agent;ctx.beginPath();ctx.arc(lerp(c.px,n.px,pp),lerp(c.py,n.py,pp),2.6,0,Math.PI*2);ctx.fill();}});}
+ /* gateways */
+ if(s>=12){var ge=s===12?ease((t-.3)/.5):1,ga=s===12?ease((t-.12)/.2):1;
+  GW.forEach(function(g,gi){var gpx=X(g.x),gpy=Y(g.y);var mr=0;N.forEach(function(n){if(n.t==='ot'&&n.g===gi){var d=Math.hypot(n.px-gpx,n.py-gpy);if(d>mr)mr=d;}});var rad=(mr+rs*2.2)*ge;
+   if(rad>1){ctx.save();ctx.fillStyle=A(C.quantum,.07);ctx.strokeStyle=A(C.quantum,.5);ctx.setLineDash([3,4]);ctx.beginPath();ctx.arc(gpx,gpy,rad,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();}
+   if(ga>0){var gs=rs*1.7*ga;ctx.save();ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.strokeRect(gpx-gs,gpy-gs,gs*2,gs*2);ctx.restore();}
+  });
+  if(s===12&&ga>0)label('PQ gateways',X(GW[1].x)+14,Y(GW[1].y)-14,A(C.quantum,ga));
+ }
+ /* nodes */
+ N.forEach(function(n){if(!n.vis)return;var x=n.px,y=n.py,r=rs*(n.t==='ca'?1.25:n.t==='partner'?1.05:1);
+  if(s===2){r*=lerp(.25,1,ease((t*1.04-n.disc)/.05));}
+  shape(n.t,x,y,r);ctx.fillStyle=A(C.muted,s<=1?.38:.62);ctx.fill();
+  if(riskA>0){shape(n.t,x,y,r);ctx.fillStyle=riskFill(n.risk,riskA);ctx.fill();}
+  if(n.kex||n.pok){shape(n.t,x,y,r);ctx.fillStyle=C.agent;ctx.fill();}
+  if(n.hit){shape(n.t,x,y,r);ctx.fillStyle=C.risk;ctx.fill();}
+  if(s===2&&n.inferred)ring(x,y,r+3.2,C.human,1.3,[2,2]);
+  if(n.sig)ring(x,y,r+3,A(C.agent,.9),1.3);
+  if(n.sh)ring(x,y,r+4.5,C.agent,1.4,[3,2]);
+  if(s===4&&n.disc<=t*1.05&&n.t!=='ot'){ctx.fillStyle=C.agent;ctx.beginPath();ctx.arc(x+r+2.6,y-r-1.5,1.4+n.risk*.6,0,Math.PI*2);ctx.fill();}
+  var locked=(s===5&&n.gated&&t<n.unlockAt)||((s===6||s===7)&&n.gated&&n.unlockAt>1)||(s===8&&n.gated&&n.unlockAt>1&&!n.kex);
+  if(locked)lockIcon(x+r+4,y-r-2,rs*1.35);
+  if(s===6&&n.cert){var an=reduce?n.r*6:now/650+n.r*6;ctx.save();ctx.strokeStyle=C.agent;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(x,y,r+3.5,an,an+1.7);ctx.stroke();ctx.restore();}
+  if(s===7&&n.lab){ctx.save();ctx.setLineDash([2,2]);ctx.strokeStyle=C.agent;ctx.strokeRect(x-r-4,y-r-4,2*r+8,2*r+8);ctx.restore();if(n.labFail){if(t>=.25&&t<.6)xIcon(x+r+6,y-r-5,3);else if(t>=.6)checkIcon(x+r+6,y-r-5,3.2);}}
+  if(s===11){if(n.web){if(t<.65)clockIcon(x+r+5,y-r-4,3.4);else ring(x,y,r+5,C.agent,1.6);}else if(n.app&&n.disc<=t*1.05){ctx.fillStyle=C.agent;ctx.fillRect(x+r+1.5,y-r-4,3.6,3.6);}}
+  if(s===13){var st=n.hx/1.06;if(t>=st&&t<st+.05)ring(x,y,r+5,A(C.ink,.8),1.4);if(n.fb&&t>=st&&t<st+.16)ring(x,y,r+4,C.risk,2.2);}
+  if(s===14&&t>=n.fixAt&&t<n.fixAt+.05&&(n.t==='it'||n.t==='ca'||n.t==='partner'))ring(x,y,r+5,A(C.ink,.8),1.4);
+ });
+ /* overlays */
+ if(s===2&&t<1&&!reduce){var ang=-Math.PI/2+t*2*Math.PI*1.04;ctx.save();ctx.fillStyle=A(C.agent,.08);ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,maxR,ang-.5,ang);ctx.closePath();ctx.fill();ctx.strokeStyle=A(C.agent,.6);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(ang)*maxR,cy+Math.sin(ang)*maxR);ctx.stroke();ctx.restore();}
+ if(s===13&&t<1){var sxp=X(t*1.06);ctx.fillStyle=A(C.agent,.07);ctx.fillRect(sxp-46,0,46,H);ctx.strokeStyle=A(C.agent,.65);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(sxp,0);ctx.lineTo(sxp,H);ctx.stroke();}
+ if(s===14&&t>.12&&t<.4){var pr2=ease((t-.12)/.22)*maxR;ctx.save();ctx.strokeStyle=A(C.risk,.7*(1-(t-.12)/.28));ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,pr2,0,Math.PI*2);ctx.stroke();ctx.restore();}
+ return cnt;
+}
+
+/* ---------- quantum canvas ---------- */
+function drawQ(sc,t,now){
+ qx.clearRect(0,0,QW,QH);
+ var on=!!sc.q;var x0=2,y0=4,sz=Math.min(QH-24,QW*.36),cs=sz/16;
+ for(var i=0;i<16;i++)for(var j=0;j<16;j++){var v=QM[i][j];if(v===0){qx.fillStyle=A(C.muted,.06);}else qx.fillStyle=v>0?A(C.quantum,.12+.7*v):A(C.agent,.12+.7*-v);qx.fillRect(x0+j*cs,y0+i*cs,cs-1,cs-1);}
+ if(on&&t<1&&!reduce){var row=Math.floor(now/90)%16;qx.strokeStyle=C.ink;qx.lineWidth=1;qx.strokeRect(x0-.5,y0+row*cs-.5,sz,cs);}
+ var sy=y0+sz+6;
+ if(on&&!reduce){var pf=.32*Math.pow(1-t,2);for(i=0;i<16;i++)if(R2()<pf)spins[i]=!spins[i];}
+ for(i=0;i<16;i++){qx.fillStyle=spins[i]?(on?C.quantum:A(C.muted,.4)):C.surface2;qx.fillRect(x0+i*cs,sy,cs-1,9);}
+ var px0=x0+sz+18,px1=QW-4,py0=10,py1=QH-16;
+ qx.strokeStyle=C.line;qx.lineWidth=1;qx.beginPath();qx.moveTo(px0,py0);qx.lineTo(px0,py1);qx.lineTo(px1,py1);qx.stroke();
+ qx.font='500 9.5px '+MONO;qx.fillStyle=C.muted;qx.textAlign='left';qx.fillText('cost',px0+3,py0+2);qx.textAlign='right';qx.fillText('iterations',px1,QH-3);
+ if(!on)return;
+ var Ef=sc.q.Ef,Eb=sc.q.Eb,tt=reduce?1:t;
+ function yv(e){return py1-(e/1.12)*(py1-py0);}
+ function xv(k){return px0+k*(px1-px0);}
+ if(tt>.3){qx.save();qx.setLineDash([4,3]);qx.strokeStyle=C.muted;qx.lineWidth=1.5;qx.beginPath();qx.moveTo(xv(.3),yv(Eb));qx.lineTo(xv(tt),yv(Eb));qx.stroke();qx.restore();qx.fillStyle=C.muted;qx.textAlign='right';qx.fillText('classical',xv(Math.max(tt,.55)),yv(Eb)-5);}
+ qx.strokeStyle=C.quantum;qx.lineWidth=2;qx.beginPath();
+ for(var k=0;k<=tt+1e-6;k+=.01){var e=Ef+(1-Ef)*Math.exp(-4.6*k)+.045*(1-k)*Math.sin(41*k+sc.n);if(k===0)qx.moveTo(xv(k),yv(e));else qx.lineTo(xv(k),yv(e));}
+ qx.stroke();
+ qx.fillStyle=C.quantum;qx.textAlign='left';qx.fillText('QUBO',xv(.04)+4,yv(.98)+10);
+ if(tt>=1){var win=Ef<Eb;qx.fillStyle=win?C.quantum:C.muted;qx.beginPath();qx.arc(xv(1)-3,yv(win?Ef:Eb),4,0,Math.PI*2);qx.fill();}
+}
+
+/* ---------- DOM ---------- */
+var $=function(id){return document.getElementById(id);};
+var cur=0,stepStart=performance.now(),playing=false,lastMeter='';
+var esc=function(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+
+// timeline
+var Y0=2026,Y1=2035.6;function pct(y){return (clamp(y,Y0,Y1)-Y0)/(Y1-Y0)*100;}
+(function(){var tl=$('tlin'),h='';for(var y=2026;y<=2035;y++){h+='<div class="tl-tick" style="left:'+pct(y)+'%"></div><div class="tl-yr" style="left:'+pct(y)+'%">'+y+'</div>';}
+ var M=[[2027,'EU first steps · CNSA 2.0',0],[2027.6,'Chrome PQ root store',1],[2027.95,'EU CRA applies',2],[2029.2,'47-day certificates',0],[2031,'End 2030: EU high-risk deadline',1,1],[2035,'Disallowed (NIST draft)',2]];
+ M.forEach(function(m){h+='<div class="tl-m'+(m[3]?' strong':'')+'" style="left:'+pct(m[0])+'%" title="'+esc(m[1])+'"></div><div class="tl-lab'+(m[3]?' strong':'')+'" style="left:'+pct(m[0])+'%;top:'+(6+m[2]*14)+'px">'+esc(m[1])+'</div>';});
+ h+='<div class="tl-today" style="left:'+pct(2026.78)+'%"><span>Today</span></div>';
+ tl.insertAdjacentHTML('beforeend',h);
+ var lab=tl.querySelectorAll('.tl-lab');lab.forEach(function(el){var l=parseFloat(el.style.left);if(l>88){el.style.transform='translateX(-100%)';}});})();
+
+// rail
+(function(){var rl=$('rail'),h='';SCENES.forEach(function(sc,i){var lbl=i===0?'Start':i===15?'Result':String(i);var q=sc.q?' q':'';h+='<button type="button" class="'+q+'" data-i="'+i+'" aria-label="'+esc(i===0?'Overview':i===15?'Result':'Step '+i+': '+sc.title)+'" title="'+esc(sc.title)+'">'+lbl+'</button>';if(i===0||i===5||i===12||i===14)h+='<span class="sep" aria-hidden="true"></span>';});rl.innerHTML=h;rl.addEventListener('click',function(e){var b=e.target.closest('button');if(b)go(+b.getAttribute('data-i'));});})();
+
+// meters
+var MET=[['cbom','Assets in CBOM'],['kex','Hybrid key exchange'],['sig','PQ signatures'],['prod','Products ready'],['ot','OT shielded'],['ver','Verified']];
+$('meters').innerHTML=MET.map(function(m){return '<div class="m"><div class="m-top"><span>'+m[1]+'</span><b id="mv-'+m[0]+'">0%</b></div><div class="bar"><i id="mb-'+m[0]+'"></i></div></div>';}).join('');
+function setMeters(c){var v={cbom:[c.cbom,N.length],kex:[c.kex,c.kexE],sig:[c.sig,c.sigE],prod:[c.prod,c.prodE],ot:[c.ot,c.otE],ver:[c.ver,N.length]};var key=JSON.stringify(v);if(key===lastMeter)return;lastMeter=key;
+ MET.forEach(function(m){var a=v[m[0]][0],b=v[m[0]][1]||1,p=Math.round(a/b*100);$('mb-'+m[0]).style.width=p+'%';$('mv-'+m[0]).textContent=m[0]==='cbom'?(a+' / '+b):(p+'%');});}
+
+function sw(kind,col){var st='background:'+col+';';if(kind==='c')st+='border-radius:50%;';if(kind==='ring')st='border:2px solid '+col+';border-radius:50%;background:transparent;';if(kind==='dring')st='border:2px dashed '+col+';border-radius:50%;background:transparent;';if(kind==='tri')st+='clip-path:polygon(50% 0,100% 100%,0 100%);';if(kind==='dia')st+='transform:rotate(45deg) scale(.8);';if(kind==='rr')st+='border-radius:3px;';return '<i class="sw" style="'+st+'"></i>';}
+function legend(s){var L=[[sw('c','var(--muted)'),'IT system'],[sw('sq','var(--muted)'),'Partner'],[sw('tri','var(--muted)'),'OT device'],[sw('dia','var(--muted)'),'PKI / CA'],[sw('rr','var(--muted)'),'Product']];
+ if(s===2)L.push([sw('dring','var(--human)'),'Inferred entry, needs review']);
+ if(s>=3&&s<15){L.push([sw('c','var(--risk)'),'High risk']);L.push([sw('c','var(--human)'),'Medium']);L.push([sw('c','color-mix(in srgb, var(--ink) 42%, transparent)'),'Low']);}
+ if(s>=5&&s<=8)L.push(['<svg width="11" height="12" viewBox="0 0 11 12" aria-hidden="true"><path d="M3 5.5V3.5a2.5 2.5 0 0 1 5 0v2" style="fill:none;stroke:var(--human);stroke-width:1.4"/><rect x="1.5" y="5.5" width="8" height="6" rx="1" style="fill:var(--human)"/></svg>','Vendor-gated']);
+ if(s>=8)L.push([sw('c','var(--agent)'),'Hybrid key exchange done']);
+ if(s>=9)L.push([sw('ring','var(--agent)'),'PQ signatures']);
+ if(s>=12)L.push([sw('c','color-mix(in srgb, var(--quantum) 30%, transparent)'),'Gateway coverage']);
+ if(s===13)L.push([sw('ring','var(--risk)'),'Classical fallback found']);
+ if(s===14)L.push([sw('c','var(--risk)'),'Hit by incident, rotating']);
+ $('legend').innerHTML=L.map(function(l){return '<span>'+l[0]+l[1]+'</span>';}).join('');}
+
+function detailHTML(sc,i){
+ if(i===0)return '<p class="big rv" style="--i:0">Post-quantum migration is a scheduling problem with a deadline.</p>'+
+  '<p class="what rv" style="--i:1">Thousands of systems, each waiting on a library, a vendor, a certificate authority or a partner, have to reach post-quantum cryptography before the end of 2030. This walkthrough follows one illustrative organization of 112 assets through all 14 steps: agents do the work, people approve at seven gates, and quantum optimization plans what moves when.</p>'+
+  '<div class="stats rv" style="--i:2"><div class="stat"><b>38%</b><span>of organizations are actively preparing, down from 41% a year earlier</span></div><div class="stat"><b>49%</b><span>cite lack of expertise as a PQC challenge</span></div><div class="stat"><b>&lt;500k</b><span>physical qubits to break ECC-256 in minutes (Google, March 2026)</span></div><div class="stat"><b>47 days</b><span>maximum public TLS certificate validity from March 2029</span></div></div>'+
+  '<div class="cols rv" style="--i:3"><div><h4>Estate (left)</h4><ul><li>Every asset of the organization.</li><li>Color shows risk, then migration progress.</li><li>Meters track progress across all steps.</li></ul></div><div><h4>Three lanes (right)</h4><ul><li>Agents: what they are doing right now.</li><li>Quantum optimization: when a solver runs, what it decides, and how it compares with a classical baseline.</li><li>Human gate: who must approve.</li></ul></div><div><h4>Controls</h4><ul><li>Play tour advances automatically.</li><li>Use Back and Next, the step buttons, or the arrow keys.</li><li>Replay restarts the current step.</li></ul></div></div>';
+ if(i===15)return '<p class="big rv" style="--i:0">The estate is quantum-safe, verified, and ready to change again.</p>'+
+  '<div class="cols rv" style="--i:1"><div><h4>What the organization gets</h4><ul><li>A live CBOM that replaces the yearly spreadsheet.</li><li>A wave plan that re-solves weekly as vendors and deadlines move.</li><li>A named approver on every critical step.</li><li>Audit evidence on demand for the EU roadmap, CRA, NIS2, DORA and NIST IR 8547.</li></ul></div>'+
+  '<div><h4>Deadlines held</h4><ul><li>End 2026: EU first steps (inventory, plan, pilots).</li><li>Jan 2027: CNSA 2.0 for new US national-security buys.</li><li>11 Dec 2027: EU Cyber Resilience Act applies (reporting since Sept 2026).</li><li>Mar 2029: 47-day public TLS certificates.</li><li>End 2030: EU high-risk migration; NIST draft deprecates 112-bit RSA.</li><li>2035: quantum-vulnerable algorithms disallowed (NIST draft).</li></ul></div>'+
+  '<div><h4>Guardrails on the agents</h4><ul><li>Agents never hold, generate or move private keys.</li><li>Everything agents read is data, never instructions.</li><li>Least privilege; agents can\'t change their own permissions.</li><li>Scanners are ground truth; inferences need a person.</li><li>Every action signed and logged; every change has a tested rollback.</li></ul></div></div>'+
+  '<p class="what rv" style="--i:2;color:var(--muted);font-size:.92rem">Quantum optimization was used where it earns its place (wave scheduling, emergency re-planning, gateway placement, clustering, test selection) and benchmarked against a classical solver every time. The standardized algorithms themselves are never modified.</p>';
+ var roles='<li><span class="chip c-agent">Agents</span><span>'+esc(sc.ag)+'</span></li>'+
+  (sc.qt?'<li><span class="chip c-q">Quantum</span><span>'+esc(sc.qt)+'</span></li>':'<li class="na"><span class="chip c-neutral">Quantum</span><span>'+esc(sc.qno)+'</span></li>')+
+  '<li><span class="chip c-human">Gate '+esc(sc.gate.c)+'</span><span>'+esc(sc.gate.who)+': '+esc(sc.gate.d)+'</span></li>';
+ return '<p class="what rv" style="--i:0">'+esc(sc.what)+'</p>'+
+  '<div class="dg"><div class="dc rv" style="--i:1"><h4>Issue today</h4><p>'+esc(sc.issue)+'</p></div>'+
+  '<div class="dc bn rv" style="--i:2"><h4>Bottleneck <span class="chip">'+esc(sc.bt)+'</span></h4><p>'+esc(sc.bn)+'</p></div>'+
+  '<div class="dc rv" style="--i:3"><h4>Our solution</h4><p class="lead">'+esc(sc.lead)+'</p><ul class="roles">'+roles+'</ul></div></div>'+
+  '<div class="dk"><div class="done rv" style="--i:4"><h4>Done when</h4><p>'+esc(sc.done)+'</p></div><div class="watch rv" style="--i:5"><h4>Watch out</h4><p>'+esc(sc.watch)+'</p></div></div>';
+}
+
+var logEls=[],gEls=[];
+function go(i){
+ i=clamp(i,0,SCENES.length-1);cur=i;stepStart=performance.now();lastMeter='';
+ var sc=SCENES[i];
+ $('kick').textContent=i===0?'Start · Overview':i===15?'Result':('Step '+i+' of 14 · '+sc.phase+' · '+sc.when);
+ $('stitle').textContent=(i>0&&i<15?String(i).padStart(2,'0')+' · ':'')+sc.title;
+ $('cvs').textContent=STATUS[i];
+ // timeline window
+ var w=$('tlwin');if(sc.win){w.style.opacity=1;w.style.left=pct(sc.win[0])+'%';w.style.width=Math.max(1.2,pct(sc.win[1])-pct(sc.win[0]))+'%';}else{w.style.opacity=0;}
+ // rail
+ [].forEach.call($('rail').querySelectorAll('button'),function(b){var k=+b.getAttribute('data-i');b.classList.toggle('on',k===i);b.classList.toggle('done',k<i);});
+ var onb=$('rail').querySelector('button.on');if(onb&&onb.scrollIntoView){try{onb.scrollIntoView({block:'nearest',inline:'center',behavior:reduce?'auto':'smooth'});}catch(e){}}
+ // agents
+ var lg=$('log');lg.innerHTML='';logEls=sc.log.map(function(l){var li=document.createElement('li');li.hidden=true;li.innerHTML='<span class="chip c-agent">'+esc(l[0])+'</span><span></span>';lg.appendChild(li);return{li:li,txt:li.lastChild,full:l[1],shown:-1};});
+ // quantum
+ var lq=$('laneQ');lq.classList.toggle('off',!sc.q);
+ $('qfit').textContent=sc.q?(sc.q.fit+' fit'):'Not used';$('qfit').className='chip '+(sc.q?(sc.q.fit==='Strong'?'c-q':'c-neutral'):'c-neutral');
+ $('qmeta').innerHTML=sc.q?('<b>'+esc(sc.q.model)+'</b><span>Decides: '+esc(sc.q.dec)+'</span><span>Classical baseline: '+esc(sc.q.base)+'</span>'):('<span>'+esc(sc.qno)+'</span>');
+ for(var k=0;k<16;k++)spins[k]=R2()<.5;
+ // gate
+ $('gcode').textContent=sc.gate.c;
+ $('gwho').innerHTML='<b>'+esc(sc.gate.who)+'</b><span>'+esc(sc.gate.d)+'</span>';
+ var seq=i===0?GS.intro:i===15?GS.final:(GS[sc.gate.c]||GS.def);
+ var gl=$('gsteps');gl.innerHTML='';gEls=seq.map(function(g){var li=document.createElement('li');li.textContent=g[1];li.hidden=true;gl.appendChild(li);return{li:li,at:g[0],k:g[2]};});
+ legend(i);
+ $('detail').innerHTML=detailHTML(sc,i);
+ try{history.replaceState(null,'','#s'+i);}catch(e){}
+ updatePlay();
+}
+function updatePlay(){var b=$('play');b.innerHTML=playing?'&#10074;&#10074; Pause':'&#9654; Play tour';b.setAttribute('aria-label',playing?'Pause the tour':'Play the tour');if(!playing)b.style.setProperty('--p',0);}
+$('prev').addEventListener('click',function(){go(cur-1);});
+$('next').addEventListener('click',function(){go(cur+1);});
+$('replay').addEventListener('click',function(){go(cur);});
+$('play').addEventListener('click',function(){playing=!playing;if(playing&&cur===15)go(0);stepStart=performance.now();updatePlay();});
+document.addEventListener('keydown',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(e.key==='ArrowRight'){go(cur+1);}else if(e.key==='ArrowLeft'){go(cur-1);}});
+
+function frame(now){
+ var el=now-stepStart,t=reduce?1:clamp(el/D,0,1),sc=SCENES[cur];
+ if(W>0&&H>0){var c=drawEstate(cur,t,now);setMeters(c);}
+ if(QW>0)drawQ(sc,t,now);
+ // log
+ logEls.forEach(function(L,k){var at=.03+k*.2;if(t>=at){L.li.hidden=false;var n=reduce?L.full.length:Math.min(L.full.length,Math.floor((el-at*D)/1000*60));if(n!==L.shown){L.shown=n;L.txt.textContent=L.full.slice(0,n)+(n<L.full.length?'▍':'');}}else{L.li.hidden=true;}});
+ // gate
+ var last=-1;gEls.forEach(function(G,k){if(t>=G.at){G.li.hidden=false;last=k;}else G.li.hidden=true;});
+ gEls.forEach(function(G,k){G.li.className=(k===last?G.k:(G.k==='wait'?'':G.k));if(G.k==='wait'&&k<last)G.li.hidden=true;});
+ // quantum result
+ var qr=$('qres');if(sc.q){var txt=t>=1?(sc.q.Ef<sc.q.Eb?'Kept: QUBO plan, lower cost this run':'Kept: classical plan, it won this run'):'Solving and comparing with the classical baseline…';if(qr.textContent!==txt)qr.textContent=txt;}else if(qr.textContent!==''){qr.textContent='';}
+ // autoplay
+ if(playing){$('play').style.setProperty('--p',clamp(el/AUTO,0,1));if(el>=AUTO){if(cur<SCENES.length-1)go(cur+1);else{playing=false;updatePlay();}}}
+ requestAnimationFrame(frame);
+}
+var h=(location.hash||'').match(/^#s(\d{1,2})$/);go(h?+h[1]:0);
+requestAnimationFrame(frame);
+})();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('watchVideo');
+  var panel=document.getElementById('videoPanel');
+  var video=document.getElementById('explainVideo');
+  if(!btn||!panel||!video) return;
+  btn.addEventListener('click',function(){
+    var open=panel.hidden;
+    panel.hidden=!open;
+    btn.setAttribute('aria-expanded',open?'true':'false');
+    btn.textContent=open?'Hide the explanation video':'Watch the explanation video';
+    if(open){
+      panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+      video.play().catch(function(){});
+    }else{
+      video.pause();
+    }
+  });
+})();
+</script>
+
+</body></html>
