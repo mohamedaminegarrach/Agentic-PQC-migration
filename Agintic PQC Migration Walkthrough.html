@@ -149,7 +149,7 @@ sup{font:500 9.5px var(--f-mono);color:var(--muted)}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .rv{animation:rise .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*85ms)}
 footer{font-size:.8rem;color:var(--muted);display:grid;gap:6px;padding-top:6px}
-.explain{display:grid;gap:12px;justify-items:center;padding-top:4px}
+.explain{display:grid;gap:12px;justify-items:end}
 #watchVideo{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:12px;padding:13px 20px;cursor:pointer;font-weight:600;font-size:15px;font-family:var(--f-display);font-stretch:108%;letter-spacing:.01em}
 #watchVideo:hover{background:var(--agent);border-color:var(--agent)}
 .player{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;gap:8px}
@@ -179,6 +179,16 @@ footer ol{margin:0;padding-left:18px;display:grid;gap:2px;grid-template-columns:
 </style>
 
 <div class="app">
+  <section class="explain" id="explain" aria-label="Explanation video">
+    <button type="button" id="watchVideo" aria-expanded="false" aria-controls="videoPanel">Watch the explanation video</button>
+    <div class="player" id="videoPanel" hidden>
+      <video id="explainVideo" controls playsinline preload="metadata" src="Agentic_PQC_Migration_Video.mp4">
+        Your browser cannot play this video. Download Agentic_PQC_Migration_Video.mp4 instead.
+      </video>
+      <p>Explanation of the agentic post-quantum migration walkthrough.</p>
+    </div>
+  </section>
+
   <header class="top">
     <div class="title">
       <p class="eyebrow" id="kick">Start &middot; Overview</p>
@@ -248,16 +258,6 @@ footer ol{margin:0;padding-left:18px;display:grid;gap:2px;grid-template-columns:
       <li><a href="https://www.frontiersin.org/articles/10.3389/fphy.2014.00005/full">Lucas (2014), Ising formulations of many NP problems</a></li>
     </ol>
   </footer>
-
-  <section class="explain" id="explain" aria-label="Explanation video">
-    <button type="button" id="watchVideo" aria-expanded="false" aria-controls="videoPanel">Watch the explanation video</button>
-    <div class="player" id="videoPanel" hidden>
-      <video id="explainVideo" controls playsinline preload="metadata" src="Agentic_PQC_Migration_Video.mp4">
-        Your browser cannot play this video. Download Agentic_PQC_Migration_Video.mp4 instead.
-      </video>
-      <p>Explanation of the agentic post-quantum migration walkthrough.</p>
-    </div>
-  </section>
 </div>
 
 <script>
