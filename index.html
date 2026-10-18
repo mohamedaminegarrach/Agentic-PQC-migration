@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Access · PQC Migration Walkthrough</title>
+<title>Access · AgentiQ Agent Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=Public+Sans:wght@400;500;600&display=swap">
@@ -37,13 +37,13 @@ button:hover{background:var(--agent);border-color:var(--agent)}
 </head>
 <body>
 <main class="card">
-  <p class="eyebrow">Agentic PQC migration</p>
+  <p class="eyebrow">AgentiQ</p>
   <h1>Enter the access code</h1>
-  <p>This walkthrough is shared privately. Enter the code you were given to open it.</p>
+  <p>This agent map is shared privately. Enter the code you were given to open it.</p>
   <form id="gate">
     <label for="code">Access code</label>
     <input id="code" name="code" type="password" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
-    <button type="submit">Open the walkthrough</button>
+    <button type="submit">Open the agent map</button>
     <p class="err" id="err" role="alert"></p>
   </form>
 </main>
@@ -51,7 +51,7 @@ button:hover{background:var(--agent);border-color:var(--agent)}
 (function(){
   var EXPECTED='d44348e4c88c289b38f94ad715588c168acfe25da44601f3e8c55177faaf5e90';
   var KEY='pqc-access';
-  var NEXT='Agintic%20PQC%20Migration%20Walkthrough.html';
+  var NEXT='AgentiQ%20Agent%20Map.html';
   var form=document.getElementById('gate');
   var input=document.getElementById('code');
   var err=document.getElementById('err');
