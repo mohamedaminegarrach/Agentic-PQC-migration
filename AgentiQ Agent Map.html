@@ -564,7 +564,7 @@ const STEPS=[
   key:"Switching off fallbacks cuts off forgotten clients: announce it, stage it, and keep a time-boxed exception process."},
  {n:14,ph:"sustain",name:"Sustain and respond",short:"Sustain and respond",gate:"G7",
   what:"Stay ready for the next change in cryptography, and close the loop.",
-  agents:[["Watchtower Lead","Team lead. Owns the crypto incident playbook and the G7 pack."],["Threat and Standards Watcher","Tracks NIST, IETF, ENISA, BSI, ANSSI and new qubit estimates."],["CVE Monitor","Watches vulnerabilities in crypto libraries and PQC implementations."],["Emergency Re-planner","Warm-starts the scheduler for a fleet-wide rotation in hours."],["Drill Coordinator","Runs a yearly algorithm-rotation drill."],["Regulatory Reporter","Drafts CRA and NIS2 incident notifications, including the 24-hour early warning, for human sign-off."]],
+  agents:[["Watchtower Lead","Team lead. Owns the crypto incident playbook and the G7 pack."],["Threat and Standards Watcher","Tracks NIST, IETF, ENISA, BSI, ANSSI and new qubit estimates."],["CVE Monitor","Watches vulnerabilities in crypto libraries and PQC implementations."],["Emergency Re-planner","Warm-starts the scheduler for a fleet-wide rotation plan in hours."],["Drill Coordinator","Runs a yearly algorithm-rotation drill."],["Regulatory Reporter","Drafts CRA and NIS2 incident notifications, including the 24-hour early warning, for human sign-off."]],
   inputs:["External feeds: standards bodies, CVEs, cryptanalysis, qubit estimates","CBOM from 02","Profiles from 04","Current plan from 08","Downgrade alerts from 13"],
   outputs:["threat.updated and incident.declared events","Emergency rotation plans","Drill reports"],
   from:[2,4,8,13],to:[1,3,4,8,11],pub:["threat.updated","incident.declared"],sub:["downgrade.detected"],
@@ -666,7 +666,7 @@ const GOV_STEPS=[1,10,13,14];
 const DOCS={
  roadmap:{title:"Build roadmap · 9 months",lead:"Preliminary plan from the AgentiQ concept note (M0–M9). The dated plan, with the demonstrator at mid-2027 at the earliest, is in the Roadmap tab.",
   rows:[["M0–M1","Consortium and architecture","Scope, IP, use case and baseline; platform services design.",[]],
-        ["M1–M3","Demonstrator","Discovery, CBOM and the first autonomous agents.",[1,2,3]],
+        ["M1–M3","Demonstrator","Discovery, CBOM and the first controlled agents (steps 01–02; step 03 later).",[1,2]],
         ["M4–M6","Enterprise-ready MVP","Build–test–repair loop, governance and CI/CD integration.",[7,11,1]],
         ["M7–M9","Pilot validation","An enterprise use case, benchmarks and hardening.",[7,13]]]},
  risks:{title:"Key risks and mitigations",lead:"From the AgentiQ concept note, with where each mitigation lives in this map.",
