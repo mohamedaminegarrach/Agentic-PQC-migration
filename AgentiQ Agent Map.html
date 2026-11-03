@@ -257,6 +257,114 @@ ul.plain li{margin:2px 0}
 .player{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px}
 .player video{width:100%;max-height:72vh;border-radius:10px;background:#000;display:block}
 .player p{margin:0;font-size:12.5px;color:var(--muted)}
+/* roadmap, agent-vs-automation split and decisions (scoped to #v-road) */
+.view.road{height:auto;min-height:0;overflow:visible;padding:0 16px 26px;display:grid;gap:26px}
+#v-road[hidden]{display:none!important}
+.road-nav{position:sticky;top:0;z-index:3;display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:var(--surface);padding:10px 0 8px;border-bottom:1px solid var(--line-soft)}
+.road-nav button{font:600 12.5px var(--f-body);color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.road-nav button:hover{border-color:var(--muted);color:var(--ink)}
+.road-nav .ver{margin-left:auto;font:500 11px var(--f-mono);color:var(--muted)}
+.rsec{display:grid;gap:12px;scroll-margin-top:60px}
+.rsec>h2{font-family:var(--f-display);font-stretch:85%;font-weight:800;font-size:22px;line-height:1.15;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.rsec>.lead{color:var(--muted);max-width:84ch;margin:0}
+.rsec h3.rh{font:600 11.5px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:6px 0 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.cards.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.cards.three{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.canvas:has(> #v-road:not([hidden])){overflow:visible}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface);display:grid;grid-template-columns:minmax(0,1fr);gap:7px;align-content:start;min-width:0}
+.card .tag,.srow .tag,.rule .tag{white-space:normal;line-height:1.3}
+.card h4{margin:0;font:700 14.5px/1.25 var(--f-display);text-wrap:balance}
+.card p{margin:0;font-size:13px}
+.card ul{margin:0;padding-left:18px;font-size:13px}
+.card ul li{margin:2px 0}
+.card.hit{cursor:pointer}
+.card.hit:hover{border-color:var(--muted)}
+.card.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.card .more{font:500 12px var(--f-body);color:var(--muted);text-decoration:underline;justify-self:start}
+.tag{display:inline-flex;align-items:center;gap:5px;font:600 10.5px/1 var(--f-mono);letter-spacing:.05em;text-transform:uppercase;padding:4px 7px;border-radius:6px;white-space:nowrap}
+.t-auto{background:var(--tint-shared);color:var(--shared)}
+.t-agent{background:var(--agent-bg);color:var(--agent)}
+.t-human{background:var(--human-bg);color:var(--human)}
+.t-q{background:var(--quantum-bg);color:var(--quantum)}
+.t-done{background:var(--tint-migrate);color:var(--migrate)}
+.t-now{background:var(--tint-prepare);color:var(--prepare)}
+.t-plan{background:var(--surface-2);color:var(--muted)}
+.t-risk{background:var(--risk-bg);color:var(--risk)}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.card.m-auto{border-top:3px solid var(--shared)}
+.card.m-agent{border-top:3px solid var(--agent)}
+.card.m-human{border-top:3px solid var(--human)}
+/* timeline */
+.tl-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.tl-svg{display:block;min-width:900px;width:100%;height:auto}
+.tl-svg .yr{font:500 11px var(--f-mono);fill:var(--muted)}
+.tl-svg .grid{stroke:var(--line);stroke-width:1}
+.tl-svg .lane{font:600 11px var(--f-mono);fill:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.tl-svg .bar{rx:6;ry:6;cursor:pointer}
+.tl-svg .bar.p-done{fill:var(--migrate)}
+.tl-svg .bar.p-now{fill:var(--prepare)}
+.tl-svg .bar.p-plan{fill:var(--surface-2);stroke:var(--muted);stroke-dasharray:4 3}
+.tl-svg .bar.p-gtm{fill:var(--tint-sustain);stroke:var(--sustain)}
+.tl-svg .bl{font:600 11.5px var(--f-body);fill:var(--ink);pointer-events:none}
+.tl-svg .bl.inv{fill:var(--bg)}
+.tl-svg .bs{font:500 10.5px var(--f-mono);fill:var(--muted);pointer-events:none}
+.tl-svg .dm{fill:var(--risk)}
+.tl-svg .dm.soft{fill:var(--muted)}
+.tl-svg .dn{font:700 11px var(--f-mono);fill:var(--surface);pointer-events:none}
+.dl-list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:4px 16px;font-size:12.5px;color:var(--muted)}
+.dl-list li{display:flex;gap:8px;align-items:flex-start}
+.dnum{flex:0 0 18px;width:18px;height:18px;border-radius:50%;background:var(--risk);color:var(--surface);font:700 10.5px/18px var(--f-mono);text-align:center}
+.dnum.soft{background:var(--muted)}
+.tl-svg .dline{stroke:var(--risk);stroke-width:1;stroke-dasharray:2 3;opacity:.7}
+.tl-svg .dline.soft{stroke:var(--muted)}
+.tl-svg .today{stroke:var(--ink);stroke-width:2}
+.tl-svg .todayl{font:600 10.5px var(--f-mono);fill:var(--ink)}
+.tl-svg g.ph:hover .bar{filter:brightness(.92)}
+.tl-svg g.ph.on .bar{stroke:var(--ink);stroke-width:2;stroke-dasharray:none}
+.tl-foot{font-size:12px;color:var(--muted);margin:0}
+/* the responsibility ladder and the decision test */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rule .q{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--surface);display:grid;grid-template-columns:minmax(0,1fr);gap:6px;min-width:0}
+.rule .q b{font:700 13.5px/1.3 var(--f-display)}
+.rule .q .ans{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;font-size:13px}
+.rule .q .ans .tag{justify-self:start}
+/* per-step split */
+.split{display:grid;gap:10px}
+.srow{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:11px 13px;display:grid;gap:8px}
+.srow.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.srow .sh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.srow .sh b{font:700 14px var(--f-display)}
+.srow .sh .pill{margin-left:0}
+.srow .sh .open{margin-left:auto;font:500 12px var(--f-body);color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.scols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.scol{display:grid;grid-template-columns:minmax(0,1fr);gap:5px;font-size:12.8px;align-content:start;min-width:0}
+.scol .tag{justify-self:start}
+.scol .why{color:var(--muted);font-size:12px}
+.sees{font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:7px}
+.sees b{color:var(--ink);font-weight:600}
+@media (max-width:900px){.scols{grid-template-columns:1fr}}
+/* layers */
+.layers{display:grid;gap:6px}
+.layer{display:grid;grid-template-columns:34px minmax(0,1.1fr) minmax(0,1.6fr);gap:10px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--surface);cursor:pointer;align-items:start}
+.layer:hover{border-color:var(--muted)}
+.layer.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.layer .ln{font:700 14px var(--f-mono);color:var(--muted)}
+.layer .lt{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;min-width:0}
+.layer .lt .tag{justify-self:start}
+.layer .lt b{font:700 13.5px var(--f-display)}
+.layer .lw{font-size:12.5px;color:var(--muted)}
+@media (max-width:700px){.layer{grid-template-columns:30px minmax(0,1fr)}.layer .lw{grid-column:2}}
+/* decisions */
+.srow{grid-template-columns:minmax(0,1fr)}
+.adr .no{font:600 11px var(--f-mono);color:var(--muted);letter-spacing:.06em}
+.adr .dec{font-size:13px}
+.adr .over{font-size:12.5px;color:var(--muted)}
+.adr .over b{color:var(--ink);font-weight:600}
+.open-list li{margin:3px 0}
+.note{border-left:3px solid var(--prepare);background:var(--tint-prepare);padding:8px 12px;border-radius:0 8px 8px 0;font-size:13px;margin:0}
+.src{font-size:12px;color:var(--muted);margin:0}
+.src code{font-family:var(--f-mono);font-size:11.5px}
 </style>
 
 <div class="wrap">
@@ -272,7 +380,7 @@ ul.plain li{margin:2px 0}
   <header class="top">
     <div>
       <h1>AgentiQ — Agent Map</h1>
-      <p class="sub">AgentiQ, the controlled multi-agent platform for post-quantum migration: the 8-stage loop, the 7 AgentiQ agents and the 14 step teams that implement them, with what flows in and out, the human gates and the feedback loop. Click anything to see its details.</p>
+      <p class="sub">AgentiQ, the controlled multi-agent platform for post-quantum migration: the 8-stage loop, the 7 AgentiQ agents and the 14 step teams that implement them, with what flows in and out, the human gates and the feedback loop. The Roadmap tab adds the project roadmap, the split between AI agents, plain automation and people, and the decisions behind the design. Click anything to see its details.</p>
     </div>
     <div class="legend" aria-label="Legend">
       <span><i class="dot" style="background:var(--prepare)"></i>Prepare</span>
@@ -290,6 +398,7 @@ ul.plain li{margin:2px 0}
     <div class="tabs" role="tablist" aria-label="Views">
       <button role="tab" id="tab-life" aria-selected="true" aria-controls="v-life">Lifecycle</button>
       <button role="tab" id="tab-wt" aria-selected="false" aria-controls="v-wt">Walkthrough</button>
+      <button role="tab" id="tab-road" aria-selected="false" aria-controls="v-road">Roadmap</button>
       <button role="tab" id="tab-tree" aria-selected="false" aria-controls="v-tree">Tree</button>
       <button role="tab" id="tab-ring" aria-selected="false" aria-controls="v-ring">Loop</button>
       <button role="tab" id="tab-events" aria-selected="false" aria-controls="v-events">Events</button>
@@ -323,6 +432,19 @@ ul.plain li{margin:2px 0}
         </div>
        </div>
        <p class="w-src" id="wsrc"></p>
+      </div>
+      <div class="view road" id="v-road" role="tabpanel" aria-labelledby="tab-road" hidden>
+       <nav class="road-nav" aria-label="Roadmap sections">
+        <button type="button" data-road="r-360">360° view</button>
+        <button type="button" data-road="r-road">Roadmap</button>
+        <button type="button" data-road="r-split">AI agents vs automation vs people</button>
+        <button type="button" data-road="r-adr">Why this, not that</button>
+        <span class="ver" id="road-ver"></span>
+       </nav>
+       <section class="rsec" id="r-360" aria-label="The project in one view"></section>
+       <section class="rsec" id="r-road" aria-label="Project roadmap"></section>
+       <section class="rsec" id="r-split" aria-label="What needs an AI agent, what is plain automation, what stays with people"></section>
+       <section class="rsec" id="r-adr" aria-label="Decisions and the options rejected"></section>
       </div>
       <div class="view" id="v-tree" role="tabpanel" aria-labelledby="tab-tree" hidden><svg id="tree-svg" aria-label="Tree of phases, steps and agents"></svg><span class="hint">Scroll or pinch to zoom · drag to pan · click a step to open its agents</span></div>
       <div class="view" id="v-ring" role="tabpanel" aria-labelledby="tab-ring" hidden><svg id="ring-svg" viewBox="0 0 760 760" aria-label="Loop of the 14 steps and their links"></svg><span class="hint">Click a step: amber links feed it, teal links leave it. Dashed links are the feedback loop.</span></div>
@@ -542,7 +664,7 @@ const STG=id=>STAGES.find(x=>x.id===id);
 const stepStages=n=>STAGES.filter(x=>x.steps.includes(n));
 const GOV_STEPS=[1,10,13,14];
 const DOCS={
- roadmap:{title:"Build roadmap · 9 months",lead:"Preliminary plan from the AgentiQ concept note. The step mapping is a suggestion for discussion.",
+ roadmap:{title:"Build roadmap · 9 months",lead:"Preliminary plan from the AgentiQ concept note (M0–M9). The dated plan, with the demonstrator at mid-2027 at the earliest, is in the Roadmap tab.",
   rows:[["M0–M1","Consortium and architecture","Scope, IP, use case and baseline; platform services design.",[]],
         ["M1–M3","Demonstrator","Discovery, CBOM and the first autonomous agents.",[1,2,3]],
         ["M4–M6","Enterprise-ready MVP","Build–test–repair loop, governance and CI/CD integration.",[7,11,1]],
@@ -1045,6 +1167,8 @@ function renderPanel(){
     <h3>Step teams</h3><div class="chips">${st.steps.map(n=>stepChip(n)).join("")}</div>
     ${(s.id==="test"||s.id==="repair")?`<h3>The Test ⇋ Repair loop</h3><p>The Build Verifier and Test Runner find a failure; the Failure Triage Agent pins down the exact path; the Repair Agent proposes a corrective change (<span class="chip mono">repair.proposed</span>) and the change is retested. After repeated failures it escalates to a person, and a failed production rollout is rolled back by the Rollback Guardian.</p>`:""}
     <h3>${s.id==="monitor"?"Loops back to":"Next"}</h3><div class="chips">${nxt.map(stageChip).join("")}</div>`;
+  } else if(s.type==="rphase"||s.type==="adr"||s.type==="rsplit"||s.type==="rlayer"){
+    h=roadPanel(s);
   } else if(s.type==="doc"){
     const D=DOCS[s.k];
     h=`<div class="eyebrow"><span class="pill ph-fam">AgentiQ</span></div><h2>${esc(D.title)}</h2><p>${esc(D.lead)}</p>
@@ -1074,7 +1198,7 @@ function renderPanel(){
     <h3>What makes it different</h3><p>Not another scanner or dashboard: a closed-loop migration engine that plans, executes, tests, diagnoses and repairs, while critical production decisions stay with people. It targets the gap between knowing what must change and safely executing and validating the change.</p>
     <h3>Phases</h3><div class="chips">${["prepare","migrate","sustain"].map(p=>`<button class="chip" data-phase="${p}" style="border-color:${phColor(p)};color:${phColor(p)}">${PHASES[p].name} · ${PHASES[p].span}</button>`).join("")}</div>
     <h3>Design principles</h3><ol class="plain" style="padding-left:20px">${PRINCIPLES.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>
-    <h3>Build and business</h3><div class="chips">${docChip("roadmap","Build roadmap · 9 months")}${docChip("risks","Risks and mitigations")}${docChip("model","Business model")}${docChip("consortium","Founding consortium")}</div>
+    <h3>Build and business</h3><div class="chips">${docChip("roadmap","Build roadmap · 9 months")}${docChip("risks","Risks and mitigations")}${docChip("model","Business model")}${docChip("consortium","Founding consortium")}<button class="chip" data-road="r-360" style="border-color:var(--prepare);color:var(--prepare)">Roadmap · agents vs automation · decisions &rarr;</button></div>
     <h3>Start here</h3><div class="chips"><button class="chip" data-play="0">&#9654; Play the walkthrough</button>${stepChip(8,"out")}${stepChip(2)}${stageChip("repair")}<button class="chip" data-gates="1">Human gates</button><button class="chip" data-platform="1">Shared platform</button></div>`;
   }
   if(s.type!=="root") h=`<button class="back" id="home">← Overview</button>`+h;
@@ -1092,6 +1216,7 @@ function renderPanel(){
   panel.querySelectorAll("[data-play]").forEach(b=>b.addEventListener("click",()=>{show("wt"); const k=+b.dataset.play; if(window.wtGo) wtGo(k,true);}));
   panel.querySelectorAll("[data-gates]").forEach(b=>b.addEventListener("click",()=>select({type:"gates"},true)));
   panel.querySelectorAll("[data-platform]").forEach(b=>b.addEventListener("click",()=>select({type:"platform"},true)));
+  if(typeof wireRoadChips==="function") wireRoadChips(panel);
   const home=document.getElementById("home"); if(home) home.addEventListener("click",()=>select({type:"root"},true));
 }
 
@@ -1099,13 +1224,13 @@ function renderPanel(){
 function select(sel,fromPanel){
   selected=sel;
   if(currentView==="tree"){ ensureVisibleInTree(sel); if(fromPanel) setTimeout(()=>centerOn(sel),dur+20); }
-  applyTreeHighlight(); applyRing(); applyMatrix(); applyLife(); renderPanel();
+  applyTreeHighlight(); applyRing(); applyMatrix(); applyLife(); renderPanel(); if(typeof applyRoad==="function") applyRoad();
   if(!WT_FROM&&window.wtGo){ if(sel.type==='step') wtGo(sel.n,true); else if(sel.type==='root') wtGo(0,true); else if(sel.type==='result') wtGo(15,true); }
   try{ if(sel.type==="step") history.replaceState(null,"","#s"+pad(sel.n)); }catch(e){}
 }
 
 /* ===================== TABS & TOOLS ===================== */
-const tabs={life:"tab-life",wt:"tab-wt",tree:"tab-tree",ring:"tab-ring",events:"tab-events"}, views={life:"v-life",wt:"v-wt",tree:"v-tree",ring:"v-ring",events:"v-events"};
+const tabs={life:"tab-life",wt:"tab-wt",road:"tab-road",tree:"tab-tree",ring:"tab-ring",events:"tab-events"}, views={life:"v-life",wt:"v-wt",road:"v-road",tree:"v-tree",ring:"v-ring",events:"v-events"};
 function show(v){
   currentView=v;
   Object.keys(tabs).forEach(k=>{document.getElementById(tabs[k]).setAttribute("aria-selected",String(k===v)); document.getElementById(views[k]).hidden=k!==v;});
@@ -1471,12 +1596,445 @@ requestAnimationFrame(frame);
 })();
 
 document.getElementById('wsrc').innerHTML='The estate, agent log and solver traces are an illustrative simulation of one organization with 112 assets. Sources: '+WT_SOURCES.map(function(s,i){return '<a href="'+s[1]+'" target="_blank" rel="noopener">'+esc(s[0])+'</a>';}).join(' · ')+'.';
+/* ===================== ROADMAP, AGENT-VS-AUTOMATION SPLIT, DECISIONS ===================== */
+/* Sources: 00_HANDOFF_README (20 Oct 2026), 02_TODO_CTO and 01_TODO_CEO, the Demonstrator Specification v1 (21 Oct 2026),
+   the Intern Onboarding and Work Plan v1 (24-week plan), ADR-001 to ADR-010 (Proposed, 21 Oct 2026; ADR-009 amended 25 Oct 2026). */
+const ROAD_VERSION="Roadmap view · 3 November 2026";
+const ROAD_TODAY=2026.84;
+
+const ROAD_PHASES=[
+ {id:"design",name:"Design",short:"Design",when:"October 2026 – Q1 2027",from:2026.72,to:2027.25,row:0,status:"now",
+  goal:"Decide what to build and prove it on paper before anyone writes code, and start the first buyer conversations.",
+  done:["Full technical report (17 sections), agent catalogue (82 agents) and this agent map","Ten architecture decision records, all Proposed (ADR-001 to ADR-010)","Demonstrator specification for steps 01–02: the slice per layer, 26 acceptance tests, a 20-minute demo script","24-week intern plan with go/no-go at weeks 3, 10 and 17","US market analysis, competitor landscape (19 countries), positioning and battle cards, client maturity model, ICP and personas, discovery call script and target list","Two videos: the 18-minute explainer and the 3.5-minute pitch"],
+  left:["Run the first 10–15 discovery calls and rewrite the personas from the notes","Offer ladder and pilot proposal template (CEO with CTO)","Technology landscape review and the platform security and trust document","Recruit interns A, B and C; fix the start date; accept the ADRs","EU client analysis in the same format as the US one"],
+  exit:"Three interns signed, the start date fixed, the repository, the estate machine and the model API budget ready (before-day-one checklist A1–A11).",
+  never:"No product claim beyond the design. Nothing scans a real system.",
+  steps:[1,2],team:"CEO and CTO"},
+ {id:"demo",name:"Demonstrator, steps 01–02",short:"Demonstrator 01–02",when:"24 weeks from the intern start · mid-2027 at the earliest",from:2027.0,to:2027.6,row:1,status:"plan",
+  goal:"One end-to-end run on a test estate, from a company questionnaire to an owner-attested CBOM, through gates G1 and G2. It proves the architecture is real, the CBOM is standard and honest, agents stay grounded, people decide, and the gap to every competitor is visible on one screen.",
+  done:[],
+  left:["Agent layer: 14 agents in two teams (step 01 governance, step 02 discovery), each a registered, versioned unit with a prompt, tool scopes and an eval set","Agent safety: tool gateway with read-only scopes, injection shield, action log, model and prompt registry","Platform services: NATS bus with signed envelopes, gate service, evidence ledger, orchestrator, secrets boundary","World model: the CBOM graph in PostgreSQL, CycloneDX 1.6 and 1.7 export that validates","Engines: five wrapped scanners (code, network, config, PKI/HSM/KMS, passive traffic), CBOM builder, policy engine on OPA","People: a minimal console with the questionnaire, the gate inbox, the CBOM explorer, the coverage report and the review queue","A test estate of 20–40 endpoints with a machine-readable ground truth"],
+  miles:["M3, week 3: estate ready, the four contracts frozen","M10, week 10: first CBOM from real findings; baselines and the cost per run measured","M17, week 17: one full run from questionnaire to G2; every gate test passed at least once","Week 24: the demo script runs twice in a row; reports accepted; recorded fallback produced"],
+  exit:"All gate tests pass (scope refusal, OT passive only, no private key crosses the gateway, CycloneDX validity, injection resistance, G1 and G2 round trips, event signatures, tool-scope enforcement, the full run). A new engineer reproduces the slice on a fresh machine in one day.",
+  never:"No transformation, testing, planning or production change is shown as working. Steps 03–14 appear only as subscribers on the bus, labelled design. No optimizer. No real customer system is scanned.",
+  steps:[1,2],team:"CTO with interns A (governance agents), B (scanners) and C (CBOM graph)"},
+ {id:"mvp",name:"Enterprise MVP, steps 03–08",short:"Enterprise MVP 03–08",when:"After the demonstrator · 2027–2028, planning assumption",from:2027.6,to:2028.35,row:0,status:"plan",
+  goal:"From an attested CBOM to the first approved, tested and reversible production change: risk and clusters, profiles, the vendor register, certificate automation, the Test ⇋ Repair lab, and the scheduler with wave 1 hybrid key exchange.",
+  done:[],
+  left:["Risk engine and the first optimizer (clustering and scheduling, QUBO against the classical baseline; the optimizer stack is an open decision)","Lab engine (digital twin), change engine (canary and rollback) and the controlled workspace","Integrations: PKI, HSM and KMS metadata, CI/CD, CMDB, SIEM, ticketing","Kubernetes with Helm, the air-gap bundle built by CI, and the self-hosted model path qualified with the demonstrator's eval sets","Console framework, object storage and secrets broker decided (open ADRs)","Engineering handbook, evaluation and red-team plan, first engineers (intern-to-hire)"],
+  miles:["Enterprise MVP specification written with the CEO","One wave planned by the scheduler, tested in the twin, approved at G5 and deployed with rollback on a pilot-like estate"],
+  exit:"A customer could run steps 01–08 on their own estate with the platform inside their environment.",
+  never:"No claim on signing migration (09), products (10), identity (11), OT (12), verification (13) or sustain (14) yet.",
+  steps:[3,4,5,6,7,8],team:"CTO, first engineers, interns converted to hires"},
+ {id:"pilot",name:"Pilot validation",short:"Pilot",when:"2028, planning assumption",from:2028.35,to:2028.95,row:1,status:"plan",
+  goal:"One paid reference pilot with a real customer, through a US integrator or prime contractor or an EU partner: steps 01–07 and one wave of changes on an agreed scope.",
+  done:[],
+  left:["Pilot proposal with access terms, data handling and the will-not list","Independent security review of the platform, scoped and commissioned","Pilot technical post-mortem and the fixes it produces","Case study and public launch"],
+  miles:["Live traffic on the pilot scope negotiating hybrid key exchange","Evidence pack from the ledger accepted by the customer's auditor"],
+  exit:"A reference the next buyer can call, and a list of what broke.",
+  never:"No production change outside the agreed scope; no key ceremony run by the platform.",
+  steps:[1,2,3,4,5,6,7,8],team:"Company plus the partner"},
+ {id:"full",name:"Full platform, steps 09–14",short:"Full platform 09–14",when:"2028 – 2030, informed by the pilot",from:2028.95,to:2030.98,row:0,status:"plan",
+  goal:"Finish the loop: private PKI and signing (09), the CRA product track (10), identity and the public web (11), data at rest and OT (12), verify and decommission (13), sustain and respond (14).",
+  done:[],
+  left:["Detailed design of steps 09–14 from the pilot's lessons","Ledger signatures moved to ML-DSA or hybrid before the ledger holds customer evidence","US authorization path (FedRAMP or an agency authority to operate) with the partner","Optimizers for trust-anchor order, gateway placement and emergency rotation"],
+  miles:["First customer reaches verified on its high-risk systems before the end-2030 deadlines"],
+  exit:"The whole loop runs for a customer, and step 14 keeps running after the migration.",
+  never:"Nothing in this phase is promised to a buyer today; it is shown as design.",
+  steps:[9,10,11,12,13,14],team:"Engineering and delivery team"},
+ {id:"sustain",name:"Sustain as a subscription",short:"Sustain",when:"2030 onwards",from:2030.98,to:2032.05,row:1,status:"plan",
+  goal:"Step 14 as a service: watch standards, CVEs and qubit estimates, re-plan when something moves, and drill a full algorithm rotation at least once a year.",
+  done:[],left:["Sustain subscription in the offer ladder","Yearly rotation drills with the customer's incident owner"],miles:[],
+  exit:"Agility that is exercised, not just claimed.",never:"",steps:[13,14],team:"Delivery team"}
+];
+const ROAD_GTM=[
+ {name:"Discovery calls",from:2026.84,to:2027.3,row:0},
+ {name:"Soft launch: demonstrator + 2027 report",at:2027.6,row:0},
+ {name:"Offer, pricing, pilot proposal",from:2027.05,to:2027.55,row:1},
+ {name:"FedRAMP or agency ATO path, with the partner",from:2028.95,to:2030.5,row:1},
+ {name:"US partner search",from:2027.3,to:2028.1,row:2},
+ {name:"Public launch at the first pilot",at:2028.6,row:2}
+];
+const ROAD_DEADLINES=[
+ {at:2026.81,l:"22 Oct 2026 · OMB M-26-15: US agency PQC plans due (an automated, continuously maintained CBOM is required)"},
+ {at:2027.0,l:"1 Jan 2027 · CNSA 2.0: new US national-security purchases must support PQC"},
+ {at:2027.2,l:"~Mar 2027 · CISA minimum elements for a CBOM: our export must map to them",soft:true},
+ {at:2027.5,l:"Jul 2027 · SWIFT Release 8.0",soft:true},
+ {at:2027.95,l:"11 Dec 2027 · EU Cyber Resilience Act obligations apply (step 10)"},
+ {at:2029.2,l:"Mar 2029 · public TLS certificates fall to 47 days (step 06 pays for itself)",soft:true},
+ {at:2031.0,l:"31 Dec 2030 · EU high-risk systems done; EO 14412 PQC key establishment on federal high-value systems"},
+ {at:2032.0,l:"31 Dec 2031 · EO 14412 PQC signatures"}
+];
+
+const ROAD_LAYERS=[
+ {k:"people",n:"1",name:"People",mode:"human",what:"The console: gate inbox, CBOM explorer, plan view, exposure dashboard and evidence.",
+  why:"Decisions that commit the organization (budget, trust anchors, production changes, switching classical off, declaring an incident) are signed by a named person and recorded in the ledger. A gate is enforced by software, never by a prompt.",
+  conf:"People see finished packs and evidence, not raw scanner output."},
+ {k:"agents",n:"2",name:"Agent layer",mode:"agent",what:"The 14 step teams: one lead and its specialists, 82 agents in all.",
+  why:"They read unstructured material (regulations, datasheets, code, failure logs), weigh ambiguous evidence, plan coverage and draft for people. That is what a language model is for, and nothing else here needs one.",
+  conf:"Agents see excerpts and references after the injection shield, never a credential or a private key. Prompts do carry CBOM data, which is sensitive, so the model is reached only through the adapter: cloud API, a regional cloud for data residency, or a self-hosted model for air-gapped sites."},
+ {k:"safety",n:"3",name:"Agent safety and quality",mode:"auto",what:"Injection shield, agent monitor, evals and red team, model and prompt registry.",
+  why:"The controls on the agents cannot themselves be agents. They are code that a model cannot argue with: a shield that strips instructions from untrusted input, a monitor that can revoke a team's gateway token, and a registry so any past decision can be replayed.",
+  conf:"The shield runs before any untrusted text reaches a prompt (test E12)."},
+ {k:"core",n:"4",name:"Platform services",mode:"auto",what:"Orchestrator, event bus, gate service, safety guard, evidence ledger, secrets boundary, tool gateway, controlled workspace.",
+  why:"Plain software with no model inside. They enforce the rules the design sells: signed events, least-privilege tool scopes, gates that block until decided, a tamper-evident ledger, credentials brokered per call. Every one must behave the same way every time and be replayable.",
+  conf:"Secrets live only here. Events carry a reference and a hash, never the payload, so the bus never holds sensitive data."},
+ {k:"world",n:"5",name:"Shared world model",mode:"auto",what:"CBOM graph, risk register, profile catalogue, plan store, evidence store.",
+  why:"One source of truth that every team reads. It is written only by the engines and the review queue, never directly by an agent, so an agent cannot corrupt a fact.",
+  conf:"The CBOM maps the organization's weakest points. It is stored as a crown-jewel secret, inside the customer's environment, with provenance and confidence on every entry."},
+ {k:"engines",n:"6",name:"Deterministic engines",mode:"auto",what:"Scanners, CBOM builder, risk engine, optimizer, lab engine, change engine, policy engine.",
+  why:"The ground truth. Facts must have measured recall and precision against a known estate, numbers must be reproducible, policy must evaluate the same way twice, and anything that touches a lab or a canary needs a deterministic rollback. A model would guess; an engine measures.",
+  conf:"Engines see raw data (configurations, certificates, captured traffic) but run inside the customer's environment and expose results only through the tool gateway. Everything below the agent layer runs with the agent layer switched off."},
+ {k:"integ",n:"7",name:"Integrations",mode:"auto",what:"PKI, HSM and KMS, source control and CI/CD, ticketing, CMDB, SIEM, cloud, OT taps, ERP.",
+  why:"Read-only connectors by default; write access only through an approved change request. Credentials live in the connectors behind the secrets boundary, so no prompt injection can reach them.",
+  conf:"HSM and KMS connectors read certificates and key metadata only. No private key byte ever crosses the gateway (test E6). OT is observed through taps, never scanned actively."}
+];
+
+const ROAD_SPLIT={
+ 1:{auto:"Regulation library retrieval; the quick scan with the read-only scanners inside the written authorization; the policy engine checks the drafted policy.",
+    agent:"Map the organization's obligations with a citation each, draft the business case with every number traceable to an input, write the policy from jurisdiction templates, assemble the G1 pack.",
+    why:"Regulations and questionnaire answers are prose, and the output is a draft for people to sign.",
+    sees:"Organization profile, questionnaire answers, the quick-scan summary and regulation texts. No credentials, no network access."},
+ 2:{auto:"Every scanner (code, binary, active network, passive traffic, configuration); PKI, HSM and KMS connectors, metadata only; the scope check on every target; the CBOM builder with merge, CycloneDX export and schema validation; the coverage report.",
+    agent:"Plan scan coverage, decide ambiguous duplicates in the reconciler, read vendor datasheets and mark every result inferred, publish the CBOM.",
+    why:"Findings from five sources conflict and vendor documents are unstructured. A tool cannot say whether two entries are the same server; a reviewer can, and the agent proposes with a confidence score.",
+    sees:"Finding excerpts and documents after the injection shield. Never a private key byte, never a credential. The CBOM itself is stored as a crown-jewel secret."},
+ 3:{auto:"Link-level exposure scoring, the dependency graph, clustering (a QUBO solver against Leiden and METIS, the better plan kept), automatic re-scoring on every threat update.",
+    agent:"Turn the threat feed into Q-Day scenarios, propose data shelf-life and value per system, read what blocks what from change records, build the G2 risk pack.",
+    why:"Shelf-life and blockers come from documents and people, not from a scan.",
+    sees:"The CBOM graph, classification answers and threat summaries."},
+ 4:{auto:"Constraint checks per endpoint against the CBOM; the profile catalogue stored as policy-as-code and validated by the policy engine; the lab swap test that proves the agility layer.",
+    agent:"Read per-endpoint limits, propose profiles per endpoint type, track FIPS and IETF drafts, specify the agility wrapper.",
+    why:"Standards are moving text, and a profile choice weighs constraints no single rule captures.",
+    sees:"Endpoint constraints, standards documents and test results. Never key material."},
+ 5:{auto:"CAVP and CMVP status feeds, HSM capability tests in the lab (PKCS#11 v3.2, KMIP), slip alerts and vendor.date_changed events for the scheduler.",
+    agent:"Read vendor roadmaps, draft contract clauses and RFP questions, keep the vendor register current.",
+    why:"Vendor commitments live in PDFs and emails.",
+    sees:"Vendor documents after the injection shield and the budget envelope. No write access to contract systems."},
+ 6:{auto:"ACME issuance and renewal, the certificate inventory, the algorithm switch by policy on the next renewal, deployment records on the bus.",
+    agent:"Find certificates in unexpected places, plan each onboarding, propose the policy switch.",
+    why:"Onboarding thousands of certificates needs a plan per owner and per exception.",
+    sees:"Certificate metadata only. Private keys stay in the certificate authority and the HSM."},
+ 7:{auto:"The digital twin, the test runners (handshake, MTU, fragmentation, p99 latency, interoperability), the build verifier, test-matrix minimization (set-cover QUBO against greedy), automatic rollback.",
+    agent:"Configure the twin from the CBOM, design the matrix, triage failures, propose repairs in the controlled workspace, write the go/no-go packs.",
+    why:"A failing handshake log needs a diagnosis, and a repair is code written for people to review. A repair goes through the same tests and the same gate as any change.",
+    sees:"Test logs and the code copy in the isolated workspace. No production access."},
+ 8:{auto:"The scheduling optimizer (QUBO against CP-SAT, the better plan kept), the change engine (templates, canary, rollback), downgrade detection, the plan store.",
+    agent:"Frame the scheduling problem and explain the plan, write TLS, SSH and IKEv2 changes and pull requests in the workspace, propose canary steps, coordinate partners, plan secret rotation.",
+    why:"Explaining a plan to a change board and writing a configuration change are language tasks; ordering thousands of changes is not, so the solver does that.",
+    sees:"The plan store and configurations in the workspace. Production is reached only by the change engine, through an approved change request."},
+ 9:{auto:"The relying-party inventory from the CBOM, chain validation tests, trust-anchor rollout scheduling, signing-pipeline changes through CI.",
+    agent:"Map who trusts each CA, order the rollout, prepare chain configurations, write the ceremony scripts and checklists that people execute.",
+    why:"Trust relationships are documented inconsistently and the rollout order needs judgement.",
+    sees:"CA hierarchy and certificate metadata. Never key material. Stateful signature state is never restored from backup."},
+ 10:{auto:"SBOM and CBOM generation per product, end-to-end tests of the update path, policy checks against CRA requirements.",
+    agent:"Map components to CRA requirements, review boot chains, draft the technical documentation.",
+    why:"Requirements and designs are prose.",
+    sees:"Product designs, SBOMs and firmware-signing status."},
+ 11:{auto:"Library and configuration scans for JWT, OAuth, SAML, Kerberos, S/MIME and FIDO; routing through the agility layer; CI builds and tests.",
+    agent:"Draft application changes in the workspace, track each identity provider's PQC roadmap.",
+    why:"Application cryptography is buried in code that has to be read.",
+    sees:"Application code in the workspace and provider documents."},
+ 12:{auto:"Key re-wrap jobs inside the KMS (keys never leave it), the gateway placement optimizer (facility-location QUBO against MILP), passive OT monitoring. No active OT scan path exists.",
+    agent:"Plan the re-wraps, frame gateway placement, review OT safety cases, propose shielding or a funded replacement date.",
+    why:"Safety cases and device documentation are text, and a replacement decision weighs money against risk.",
+    sees:"Archive metadata, OT traffic captures and device documents."},
+ 13:{auto:"Live handshake monitoring from the SIEM, downgrade detection, classical-off enforcement by policy, audit-pack extraction from the ledger.",
+    agent:"Compile the evidence packs, plan the decommissioning order.",
+    why:"Auditors want narrative and proof together.",
+    sees:"Handshake logs and ledger extracts."},
+ 14:{auto:"Feed ingestion (standards bodies, CVEs, qubit estimates), threat.updated and incident.declared events, the warm-started re-planner, drill timers.",
+    agent:"Read and summarize standards and advisories, triage CVEs, frame the emergency rotation plan, draft CRA and NIS2 notifications, run the yearly drill.",
+    why:"New research and advisories are text, and notifications are drafted for a person's sign-off.",
+    sees:"External feeds after the injection shield, the CBOM and the current plan."}
+};
+
+const ROAD_RULE=[
+ {q:"Does it produce a fact someone will rely on?",a:"auto",t:"Deterministic engine. Recall and precision are measured against a ground truth, and the result is reproducible. A model would guess."},
+ {q:"Does it touch a secret, a private key or production?",a:"auto",t:"Never an agent. An engine behind the tool gateway, credentials from the secrets boundary, and a human gate before anything reaches production."},
+ {q:"Does it read unstructured text, weigh ambiguous evidence or draft for a person?",a:"agent",t:"An AI agent, with a structured output, a confidence score, read-only tool scopes and the injection shield in front of it."},
+ {q:"Is it irreversible, or does it commit the organization?",a:"human",t:"A named person at one of the seven gates, enforced by the gate service and recorded in the ledger."}
+];
+
+const ROAD_ADRS=[
+ {id:"ADR-001",title:"Language and service framework",dec:"Python 3.12 for every service, FastAPI for HTTP APIs, Pydantic v2 models as the single source of the four contracts, uv for packaging, Ruff and mypy in CI.",
+  over:[["Go for platform services, Python for engines","Two languages for three interns in 24 weeks."],["TypeScript throughout","Weak for the scanner ecosystem."]],
+  why:"Every scanner we wrap, every agent SDK and MCP server has first-class Python support, and the heavy work (scanning, parsing captures) is done by the wrapped tools, not by our code. One repository, one toolchain, and the interns can review each other.",
+  revisit:"A measured throughput or air-gap packaging problem in the MVP phase.",src:"ADR-001_Language_and_Service_Framework.md"},
+ {id:"ADR-002",title:"Event bus",dec:"NATS with JetStream: one stream, one subject per topic, every message a signed envelope validated before publish and after receive, durable consumers per team lead.",
+  over:[["Redis Streams","Weak persistence and replay; mixes cache and bus."],["Kafka","Far too heavy for one machine and an air-gap bundle."],["PostgreSQL as a queue","Polling, no native fan-out, a bottleneck with 14 publishers."]],
+  why:"A whole run must be replayable from the ledger, the bus must run in one small container on an air-gapped site, and only leads and the gate service may hold credentials. Specialists get none.",
+  revisit:"A multi-site or multi-tenant deployment in the MVP phase.",src:"ADR-002_Event_Bus.md"},
+ {id:"ADR-003",title:"CBOM graph store",dec:"PostgreSQL 16 as the only database, with explicit endpoint, link, asset, finding, inference and review tables; NetworkX in memory for graph algorithms; pgvector for the regulation library.",
+  over:[["Neo4j","A second database with its own backup, auth, licence limits and bundle size; interns learn Cypher; the ledger still needs PostgreSQL."],["PostgreSQL with Apache AGE","Extension maturity and packaging risk in an air-gap bundle."]],
+  why:"One container for all persistence, one backup, one access-control model. At demonstrator scale graph queries are trivial, and step 03 clustering runs in memory anyway. The store is written only by the CBOM builder and the review queue, never by an agent.",
+  revisit:"Multi-hop queries slower than a second on an MVP estate; then evaluate AGE before Neo4j.",src:"ADR-003_CBOM_Graph_Store.md"},
+ {id:"ADR-004",title:"CBOM format",dec:"CycloneDX JSON is the only external format: export validates against the 1.6 and 1.7 schemas, import accepts any valid CycloneDX CBOM and merges it through the reconciler.",
+  over:[["A proprietary export with CycloneDX as an afterthought","Becomes the lock-in we criticize in others."],["SPDX","No CBOM profile with comparable crypto detail at the time of writing."]],
+  why:"The only open standard with CBOM support, the one M-26-15 and CISA's minimum elements will be mapped to, and the one that lets a buyer bring the inventory they already have.",
+  revisit:"CISA's minimum elements (around March 2027), CycloneDX 1.8, or a customer requiring SPDX.",src:"ADR-004_CBOM_Format_and_Library.md"},
+ {id:"ADR-005",title:"Agent runtime and tool gateway",dec:"A thin in-house runtime: declarative agent definitions in a registry, an MCP tool gateway that checks scopes, the scope contract, budgets and logs every call, structured outputs everywhere, and the lead-only topology enforced in code.",
+  over:[["A general agent framework (LangGraph, CrewAI)","Free-form agent-to-agent chat is exactly what the design forbids; scopes and logging would be bolted on."],["The provider's hosted agent product","The loop and the workspace would leave the customer's environment, which contradicts on-premises and air-gapped deployment."],["The SDK tool-runner helper alone","Acceptable inside our loop, as long as every call still passes the gateway and the action log."]],
+  why:"Containment against prompt injection, least privilege per agent, replay of any past decision, and provider independence. No free-form agent chat exists anywhere in the system, and that is the property we sell.",
+  revisit:"If the runtime outgrows one engineer in the MVP phase, or a customer mandates a hosted agent platform in their private cloud.",src:"ADR-005_Agent_Runtime_and_Tool_Gateway.md"},
+ {id:"ADR-006",title:"Model provider",dec:"The Claude API behind a provider adapter: Opus 5.5 for agents that reason over the estate or write a pack, Haiku 5.5 for bulk schema-bound extraction, prompt caching and spending caps from day one; regional clouds where data residency requires it; a self-hosted open-weight model through the same adapter for air-gapped sites.",
+  over:[["A self-hosted model only","Lower quality on long tool-use chains, GPU hardware at every customer, and our own eval burden per model."],["Another cloud provider","No advantage for this design today; the adapter covers it if a customer insists."]],
+  why:"Reliable tool use, structured outputs and long context today; confidentiality handled by where the model runs, not by hoping. Nothing below the agent layer depends on a model, so a customer can run discovery, the CBOM, policy and the gates with the agents switched off.",
+  revisit:"Quarterly on model and price changes; the self-hosted selection in the MVP phase; at once if a customer forbids any external API.",src:"ADR-006_Model_Provider.md"},
+ {id:"ADR-007",title:"Policy as code",dec:"Open Policy Agent with Rego: three policy sets (crypto, scope, actions), versioned in Git with unit tests per rule. The Policy Drafter writes a draft; a person approves it at G1; the engine evaluates the CBOM on every update.",
+  over:[["A YAML rule file with a custom evaluator","We would end up writing a policy engine with no ecosystem of tests."],["Cedar or similar","Less familiar to the security teams who will read our policies."]],
+  why:"Deterministic, testable and readable by the customer. One engine serves the scanners' scope checks, the safety guard and the crypto policy, and a regulator change becomes a policy change plus a re-evaluation.",
+  revisit:"Customers whose GRC tooling needs another format: add an export, do not replace the engine.",src:"ADR-007_Policy_as_Code.md"},
+ {id:"ADR-008",title:"Scanner wrapping and licences",dec:"One Scanner interface with one adapter per proven open-source tool, run as a subprocess; each adapter declares version, licence and redistribution status; a licence register reviewed by the CEO before any commercial shipment; active adapters reject OT ranges.",
+  over:[["Fork and embed the tools","Copyleft obligations on our product."],["Write our own scanners","Years of work and the accuracy problem every competitor has."]],
+  why:"Accuracy comes from mature tools, the bill of materials stays clean before the first sale, and every finding records tool version, command and excerpt, so it is reproducible. AgentiQ writes no cryptography and no scanner.",
+  revisit:"Any licence change, the first commercial shipment, and the arrival of the Binary Analyst.",src:"ADR-008_Scanner_Wrapping_and_Licences.md"},
+ {id:"ADR-009",title:"Evidence ledger and signing",dec:"An append-only PostgreSQL table with a hash chain, Ed25519 signatures on events and gate decisions held by the platform's key service, artefacts in object storage referenced by SHA-256. Before the ledger holds customer evidence, signatures move to ML-DSA or a hybrid.",
+  over:[["A transparency log (Trillian, Rekor)","Stronger guarantees, more infrastructure than the demonstrator needs."],["A blockchain","No."]],
+  why:"Simple, auditable, replayable, in the one database we already run, and signing keys never cross into the agent layer. Ed25519 is not quantum-safe, so every signature records its algorithm and can be replaced without breaking old entries (added after the 25 October 2026 council review).",
+  revisit:"A request for external verifiability, multi-tenant keys, or ML-DSA arriving in the chosen library.",src:"ADR-009_Evidence_Ledger_and_Signing.md"},
+ {id:"ADR-010",title:"Deployment shape",dec:"Docker Compose for the demonstrator (a platform file and an estate file plus a reset script), Kubernetes with Helm for the MVP on the same images, and an air-gap bundle built by CI from the MVP on.",
+  over:[["Kubernetes from day one","Slows the interns in weeks 1–3 and makes the demo laptop heavy."],["Bare processes with systemd","Simplest for one machine, no path to the MVP."]],
+  why:"A fresh machine must run the slice in a day, the estate and the platform stay separable so a pilot replaces the estate with read-only connectors, and air-gap becomes a build artefact rather than a special project.",
+  revisit:"The first pilot's infrastructure constraints, or a customer mandating OpenShift or a sovereign cloud.",src:"ADR-010_Deployment_Shape.md"}
+];
+const ROAD_OPEN=[["Console front-end framework","Needed before the interns start on the console; the briefs no longer name one."],["Object storage for evidence files","MinIO in the demonstrator; the product choice is open."],["Secrets broker","Vault or a cloud KMS behind the secrets boundary."],["Optimizer stack","Arrives with step 03 in the MVP: which QUBO solver, CP-SAT and the large-neighbourhood search."]];
+const ROAD_CHOICES=[
+ ["Teams with one lead, not one big agent and not free chat","Specialists talk only to their lead; leads talk only through typed, signed events. A prompt injection in one specialist cannot spread, and every exchange can be replayed.",[2,8]],
+ ["A thin slice through all seven layers, not the agent layer alone","The first build touches people, agents, safety, platform services, the world model, engines and integrations. That is what separates AgentiQ from an agent layer on its own.",[1,2]],
+ ["Wrap vetted libraries, never implement cryptography","OpenSSL 3.5+, BoringSSL and AWS-LC. Algorithms are used exactly as standardized.",[4]],
+ ["Solve twice, keep the better plan","Every optimizer run solves the problem with a quantum-inspired QUBO solver and with a classical baseline (Leiden, METIS, CP-SAT, MILP, greedy). Quantum-inspired is used only where it wins, and the claim stays honest.",[3,7,8,9,12,14]],
+ ["Score links, not assets","A connection is safe only when both ends are upgraded, so exposure, clusters and plans are built on links.",[3]],
+ ["Passive-only on OT","Active scans can crash fragile devices. OT is observed through taps and captures; no active scan path exists for OT ranges.",[2,12]],
+ ["Hybrid key exchange first, signatures second","Wave 1 stops harvest-now-decrypt-later on new sessions; signatures are harder (trust-store distribution, HSM support) and come in wave 2.",[8,9]],
+ ["Gates in software, not in prompts","The gate service blocks a team until a named approver decides. A model can be talked out of a rule; a service cannot.",[1,2]],
+ ["Every inferred fact carries a confidence score and its provenance","Unknowns are tracked and shown, which is the answer to inventory paralysis and to sealed firmware.",[2]],
+ ["Events carry references, never data","The bus holds an id, a hash and a pointer into the stores, so sensitive payloads never travel on it and every event stays small and verifiable.",[]],
+ ["Inside the customer's environment, with the agents optional","On premises, private cloud or air-gapped. Everything below the agent layer runs with no model at all.",[]]
+];
+
+const ROAD_360=[
+ {h:"The problem",t:"Post-quantum migration is a scheduling problem with a deadline. Thousands of systems, each waiting on a library, a vendor, a certificate authority or a partner, must reach post-quantum cryptography before the end of 2030 (the EU high-risk deadline and the US executive order's date for key establishment), with signatures a year later. A manual program that starts today and runs six years misses it. Only 44% of US organizations have an inventory; 7% use PQC on more than half their certificates; 0 of 24 major federal agencies are fully prepared.",chips:[]},
+ {h:"What AgentiQ is",t:"A controlled multi-agent platform that runs the migration inside the customer's environment. Agents propose, deterministic tools establish the facts, and people decide. One loop (Discover → Assess → Plan → Transform → Test ⇋ Repair → Validate → Monitor), 7 agent families, 82 specialist agents in 14 step teams, 7 human gates and 17 event topics on one bus.",chips:["stage:discover","stage:repair","gates"]},
+ {h:"The gap we fill",t:"Every tool a buyer has met stops at the inventory. AgentiQ continues: an approved scope, a live CBOM, link-level risk, a plan the optimizer orders, changes made and tested in an isolated workspace, repair, verification and a yearly rotation drill. The pitch: don't buy an inventory, buy the start of the migration.",chips:["step:2","step:8","step:13"]},
+ {h:"Who we sell to",t:"US first, through an integrator or prime contractor: federal civilian agencies, defense and national-security suppliers, the largest banks, core banking processors; hospitals, utilities and OT later. The EU analysis comes next. The buyers are the CISO, the crypto architect and the PKI owner; eight personas map to the gates G1–G7.",chips:["gate:G1","gate:G3"]},
+ {h:"The offer, as planned",t:"A free readiness check, then a discovery and CBOM assessment (steps 01–03), then the migration platform licence (steps 04–13), then a sustain subscription (step 14). Pricing (licence, per asset or migration as a service) is still open.",chips:["step:1","step:3","step:14"]},
+ {h:"Where we are, 3 November 2026",t:"Design stage, no production code yet. Done: the technical report, the agent catalogue and this map, ten architecture decision records (Proposed), the demonstrator specification with 26 acceptance tests, the 24-week intern plan, the competitor, client and US market analyses, two videos. Next: the first discovery calls, three interns, and the steps 01–02 demonstrator, mid-2027 at the earliest.",chips:["rphase:design","rphase:demo"]},
+ {h:"What we need to win",t:"A US partner, a US hosting and authorization path (FedRAMP or an agency authority to operate), the demonstrator, CBOM output aligned with CISA's minimum elements and M-26-15, an independent security review of the platform, and one reference pilot.",chips:["rphase:pilot"]},
+ {h:"What we will never do",t:"See inside sealed firmware or HSMs without the vendor. Appoint owners or approve changes. Speed up FIPS or NIAP certification. Touch private keys or run key ceremonies. Create budget. Work without access. Write our own cryptography.",chips:["gate:G6","rlayer:integ"]},
+ {h:"How trust is built in",t:"Deployed on premises, in a private cloud or air-gapped. Agents never see secrets or private keys. Every inferred fact carries a confidence score. Production changes happen only through an approved change request with a tested rollback. Every action and decision lands in a signed, append-only ledger. Everything below the agent layer runs with the agents switched off.",chips:["rlayer:core","rlayer:safety","adr:ADR-009"]}
+];
+
+/* ---- helpers ---- */
+const modeTag=m=>m==="auto"?`<span class="tag t-auto">Automated · no model</span>`:m==="agent"?`<span class="tag t-agent">AI agent</span>`:`<span class="tag t-human">Person decides</span>`;
+const statusTag=s=>s==="done"?`<span class="tag t-done">Done</span>`:s==="now"?`<span class="tag t-now">In progress</span>`:`<span class="tag t-plan">Planned</span>`;
+const RP=id=>ROAD_PHASES.find(p=>p.id===id);
+const RL=k=>ROAD_LAYERS.find(l=>l.k===k);
+const RA=id=>ROAD_ADRS.find(a=>a.id===id);
+const phaseChip=id=>`<button class="chip" data-rphase="${id}" style="border-color:var(--prepare);color:var(--prepare)">${esc(RP(id).short)}</button>`;
+const adrChip=id=>`<button class="chip mono" data-adr="${id}" style="cursor:pointer">${id}</button>`;
+const layerChip=k=>`<button class="chip" data-rlayer="${k}" style="border-color:var(--shared);color:var(--shared)">${esc(RL(k).name)}</button>`;
+const gateChipR=g=>`<button class="chip" data-gate="${g}" style="border-color:var(--gate);color:var(--gate)">${g} ${esc(GATES[g].name)}</button>`;
+function anyChip(ref){
+  const [t,v]=ref.split(":");
+  if(t==="step") return stepChip(+v);
+  if(t==="gate") return gateChipR(v);
+  if(t==="gates") return `<button class="chip" data-gates="1">Seven human gates</button>`;
+  if(t==="stage") return stageChip(v);
+  if(t==="rphase") return phaseChip(v);
+  if(t==="rlayer") return layerChip(v);
+  if(t==="adr") return adrChip(v);
+  return "";
+}
+
+/* ---- renderers for the canvas ---- */
+function renderRoad360(){
+  const el=document.getElementById("r-360");
+  el.innerHTML=`<h2>The project in one view</h2>
+  <p class="lead">What AgentiQ is, who it is for, where it stands and what it refuses to do. Each card links into the map.</p>
+  <div class="cards">${ROAD_360.map(c=>`<div class="card"><h4>${esc(c.h)}</h4><p>${esc(c.t)}</p>${c.chips.length?`<div class="chips">${c.chips.map(anyChip).join("")}</div>`:""}</div>`).join("")}</div>
+  <p class="src">Sources: the handoff brief (20 Oct 2026), the US market analysis, the CEO and CTO to-do lists, the positioning document's never-claim list.</p>`;
+}
+
+function renderRoadTimeline(){
+  const el=document.getElementById("r-road");
+  const W=1000,L=14,R=14,x0=2026.68,x1=2032.08;
+  const X=y=>L+(y-x0)/(x1-x0)*(W-L-R);
+  const laneY={build:62,gtm:176,dl:300}, H=330, barH=24, rowGap=30;
+  let g="";
+  // year grid
+  for(let y=2027;y<=2032;y++) g+=`<line class="grid" x1="${X(y)}" y1="34" x2="${X(y)}" y2="${H-8}"/><text class="yr" x="${X(y)+4}" y="28">${y}</text>`;
+  g+=`<text class="yr" x="${X(2026.72)}" y="28">Oct 2026</text>`;
+  // lanes
+  g+=`<text class="lane" x="${L}" y="${laneY.build-14}">Build</text><text class="lane" x="${L}" y="${laneY.gtm-14}">Go to market</text><text class="lane" x="${L}" y="${laneY.dl-18}">External deadlines</text>`;
+  // build phases
+  ROAD_PHASES.forEach(p=>{
+    const x=X(p.from), w=Math.max(8,X(p.to)-X(p.from)), y=laneY.build+p.row*rowGap;
+    const cls="bar p-"+p.status, inv=p.status!=="plan";
+    g+=`<g class="ph" data-rphase="${p.id}" tabindex="0" role="button" aria-label="${esc(p.name)}, ${esc(p.when)}"><rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${barH}"/><text class="bl${inv?" inv":""}" x="${x+8}" y="${y+16}">${esc(p.short)}</text></g>`;
+  });
+  g+=`<text class="bs" x="${X(2027.0)}" y="${laneY.build+2*rowGap+14}">Dates after the demonstrator are planning assumptions, not commitments. Concept-note labels: demonstrator M1–M3, MVP M4–M6, pilot M7–M9.</text>`;
+  // gtm
+  ROAD_GTM.forEach(m=>{
+    const y=laneY.gtm+m.row*rowGap;
+    if(m.at!==undefined){ const x=X(m.at); g+=`<polygon class="dm soft" points="${x},${y+2} ${x+7},${y+12} ${x},${y+22} ${x-7},${y+12}" style="fill:var(--sustain)"/><text class="bs" x="${x+11}" y="${y+16}">${esc(m.name)}</text>`; }
+    else { const x=X(m.from), w=Math.max(8,X(m.to)-X(m.from)); g+=`<rect class="bar p-gtm" x="${x}" y="${y}" width="${w}" height="${barH}"/><text class="bl" x="${x+8}" y="${y+16}">${esc(m.name)}</text>`; }
+  });
+  // deadlines: numbered markers, the list sits under the chart
+  ROAD_DEADLINES.forEach((d,i)=>{
+    const x=Math.min(X(d.at),W-R-9), y=laneY.dl, soft=d.soft?" soft":"";
+    g+=`<line class="dline${soft}" x1="${x}" y1="36" x2="${x}" y2="${y-9}"/><circle class="dm${soft}" cx="${x}" cy="${y}" r="9"/><text class="dn" x="${x}" y="${y+4}" text-anchor="middle">${i+1}</text>`;
+  });
+  // today
+  const tx=X(ROAD_TODAY);
+  g+=`<line class="today" x1="${tx}" y1="36" x2="${tx}" y2="${H-14}"/><text class="todayl" x="${tx+5}" y="${H-4}">Today</text>`;
+  el.innerHTML=`<h2>Project roadmap</h2>
+  <p class="lead">Six build phases against the dates that are not ours to move. The demonstrator is a 24-week build from an intern start date that is not fixed yet; it cannot exist before the CNSA 2.0 gate of 1 January 2027, so the realistic target is mid-2027. Click a phase for its goal, what gets built, the go/no-go milestones and what it must never claim.</p>
+  <div class="tl-wrap"><svg class="tl-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Timeline from October 2026 to 2032 with the build phases, go-to-market milestones and external deadlines">${g}</svg></div>
+  <ol class="dl-list">${ROAD_DEADLINES.map((d,i)=>`<li><span class="dnum${d.soft?" soft":""}">${i+1}</span>${esc(d.l)}</li>`).join("")}</ol>
+  <p class="tl-foot">Solid blue: in progress. Dashed: planned. Amber: go to market. Red markers: deadlines that bind our buyers; grey ones matter less to us. Off the chart: NIST IR 8547 (draft) deprecates 112-bit algorithms such as RSA-2048 after 2030 and disallows all quantum-vulnerable public-key algorithms after 2035.</p>
+  <div class="cards three">${ROAD_PHASES.map(p=>`<div class="card hit" data-rphase="${p.id}" tabindex="0" role="button"><div class="tagrow">${statusTag(p.status)}<span class="tag t-plan" style="text-transform:none;letter-spacing:0">${esc(p.when)}</span></div><h4>${esc(p.name)}</h4><p>${esc(p.goal)}</p><div class="chips">${p.steps.slice(0,4).map(n=>stepChip(n)).join("")}${p.steps.length>4?`<span class="chip mono" style="cursor:default">+${p.steps.length-4}</span>`:""}</div><span class="more">Milestones and exit criteria →</span></div>`).join("")}</div>
+  <p class="note">Why this order: the demonstrator covers steps 01–02 because governance and discovery are where every buyer is stuck today and where every competitor stops. The MVP adds steps 03–08 because wave 1 (hybrid key exchange) is the change that stops harvest-now-decrypt-later, and it needs risk, profiles, vendors, certificates and the Test ⇋ Repair lab first. Steps 09–14 are designed after the pilot, because signing, OT and decommissioning depend on what a real estate teaches us.</p>
+  <p class="src">Sources: the CTO and CEO to-do lists (P0–P3), the Intern Onboarding and Work Plan v1 (Part E), the Demonstrator Specification v1 (Parts A and G), the concept note's M0–M9 plan, the US market analysis deadlines.</p>`;
+}
+
+function renderRoadSplit(){
+  const el=document.getElementById("r-split");
+  const ladder=`<div class="cards three">
+   <div class="card m-auto"><h4>Automated, no model inside</h4><p>Scanners, the CBOM builder, the risk engine, the optimizer, the lab, change and policy engines; the bus, the gate service, the safety guard, the ledger, the secrets boundary, the tool gateway; the injection shield, the agent monitor and the registry; every connector.</p><p><b>Why:</b> facts, numbers, rules and secrets. They must be reproducible, auditable, and impossible to talk out of. They run with the agent layer switched off.</p><div class="chips">${layerChip("engines")}${layerChip("core")}${layerChip("safety")}${layerChip("integ")}</div></div>
+   <div class="card m-agent"><h4>AI agents, guarded</h4><p>The 82 specialists in 14 teams: they plan coverage, read regulations, datasheets, code and failure logs, decide ambiguous duplicates, propose profiles, repairs and plans, and write the packs people sign.</p><p><b>Why:</b> unstructured input and judgement under uncertainty. <b>Guardrails:</b> read-only tool scopes, structured outputs, a confidence score on every inferred fact, the injection shield in front, no secrets, no bus credentials for specialists, evals before release, a monitor that can pause a team.</p><div class="chips">${layerChip("agents")}${FAM_ORDER.slice(0,3).map(famChip).join("")}</div></div>
+   <div class="card m-human"><h4>People at the gates</h4><p>Policy and budget, inventory attestation, profiles and trust anchors, contracts and conformity, every production change, key ceremonies and decommissioning, crypto incidents. Plus every private key operation and every appointment of an owner.</p><p><b>Why:</b> irreversible, or commits the organization. Software blocks the run until a named person decides, and the decision lands in the ledger.</p><div class="chips"><button class="chip" data-gates="1">Seven human gates</button>${layerChip("people")}</div></div>
+  </div>`;
+  const rule=`<h3 class="rh">The test we apply to every task</h3><div class="rule">${ROAD_RULE.map((r,i)=>`<div class="q"><b>${i+1}. ${esc(r.q)}</b><div class="ans">${modeTag(r.a)}<span>${esc(r.t)}</span></div></div>`).join("")}</div>`;
+  const layers=`<h3 class="rh">The seven layers, and why each one is what it is</h3><div class="layers">${ROAD_LAYERS.map(l=>`<div class="layer" data-rlayer="${l.k}" tabindex="0" role="button"><span class="ln">${l.n}</span><div class="lt"><b>${esc(l.name)}</b>${modeTag(l.mode)}<span style="font-size:12.5px">${esc(l.what)}</span></div><div class="lw">${esc(l.why)}</div></div>`).join("")}</div>`;
+  const rows=STEPS.map(st=>{const r=ROAD_SPLIT[st.n]; const G=GATES[st.gate];
+    return `<div class="srow" data-rsplit="${st.n}"><div class="sh">${stepChip(st.n)}${phPill(st.ph)}<b>${esc(st.name)}</b><button type="button" class="open" data-rsplit-open="${st.n}">Open in the panel →</button></div>
+    <div class="scols">
+     <div class="scol">${modeTag("auto")}<span>${esc(r.auto)}</span></div>
+     <div class="scol">${modeTag("agent")}<span>${esc(r.agent)}</span><span class="why">Why an agent: ${esc(r.why)}</span></div>
+     <div class="scol">${modeTag("human")}<span><b style="font-family:var(--f-mono);color:var(--gate)">${st.gate}</b> ${esc(G.name)}: ${esc(G.who)}. ${esc(G.what)}</span></div>
+    </div>
+    <div class="sees"><b>What the agents may see:</b> ${esc(r.sees)}</div></div>`;}).join("");
+  el.innerHTML=`<h2>What needs an AI agent, what is plain automation, what stays with people</h2>
+  <p class="lead">The split is a security decision, not a convenience. Anything that produces a fact, touches a secret or reaches production is deterministic software. Anything that needs reading, judgement or drafting is an agent behind guardrails. Anything irreversible is a person. The same rule runs through every layer and every step.</p>
+  ${ladder}${rule}${layers}
+  <h3 class="rh">Step by step: the three columns and what the agents are allowed to see</h3>
+  <div class="split">${rows}</div>
+  <p class="src">Sources: the technical report's platform layers and safety rules, the agent catalogue, the Demonstrator Specification (Parts B and E), ADR-005, ADR-006 and ADR-007.</p>`;
+}
+
+function renderRoadAdr(){
+  const el=document.getElementById("r-adr");
+  el.innerHTML=`<h2>Why this, not that</h2>
+  <p class="lead">Ten architecture decisions, each with the options that were rejected and why, and the trigger that would reopen it. All are Proposed, pending the CTO's acceptance. Below them, the design choices that sit behind the records.</p>
+  <div class="cards two">${ROAD_ADRS.map(a=>`<div class="card hit adr" data-adr="${a.id}" tabindex="0" role="button"><span class="no">${a.id} · Proposed · 21 Oct 2026</span><h4>${esc(a.title)}</h4><p class="dec">${esc(a.dec)}</p><p class="over"><b>Not chosen:</b> ${a.over.map(o=>esc(o[0])).join(" · ")}</p><span class="more">Why, and when to revisit →</span></div>`).join("")}</div>
+  <h3 class="rh">Still open</h3>
+  <div class="cards"><div class="card" style="grid-column:1/-1"><ul class="open-list">${ROAD_OPEN.map(o=>`<li><b>${esc(o[0])}.</b> ${esc(o[1])}</li>`).join("")}</ul></div></div>
+  <h3 class="rh">Design choices behind the records</h3>
+  <div class="cards">${ROAD_CHOICES.map(c=>`<div class="card"><h4>${esc(c[0])}</h4><p>${esc(c[1])}</p>${c[2].length?`<div class="chips">${c[2].map(n=>stepChip(n)).join("")}</div>`:""}</div>`).join("")}</div>
+  <p class="src">Sources: <code>02_Product_and_Technical/ADR/ADR-001</code> to <code>ADR-010</code> and the technical report (sections 5–7 and 17).</p>`;
+}
+
+/* ---- panel content for the new selection types ---- */
+function roadPanel(s){
+  if(s.type==="rphase"){
+    const p=RP(s.id);
+    return `<div class="eyebrow">Roadmap phase ${statusTag(p.status)}</div><h2>${esc(p.name)}</h2><p class="p-lead">${esc(p.when)}</p><p>${esc(p.goal)}</p>
+    ${p.done.length?`<h3>Done</h3><ul class="plain">${p.done.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+    ${p.left.length?`<h3>${p.status==="now"?"Still to do":"What gets built"}</h3><ul class="plain">${p.left.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+    ${p.miles&&p.miles.length?`<h3>Milestones and go/no-go</h3><ul class="plain">${p.miles.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+    <h3>Done when</h3><div class="done">${esc(p.exit)}</div>
+    ${p.never?`<h3>Must never claim</h3><div class="key">${esc(p.never)}</div>`:""}
+    <h3>Team</h3><p>${esc(p.team)}</p>
+    <h3>Steps in this phase</h3><div class="chips">${p.steps.map(n=>stepChip(n)).join("")}</div>
+    <h3>Other phases</h3><div class="chips">${ROAD_PHASES.filter(x=>x.id!==p.id).map(x=>phaseChip(x.id)).join("")}</div>
+    <h3>See also</h3><div class="chips"><button class="chip" data-road="r-road">Roadmap timeline</button><button class="chip" data-road="r-split">Agents vs automation</button></div>`;
+  }
+  if(s.type==="adr"){
+    const a=RA(s.id);
+    return `<div class="eyebrow"><span class="pill ph-shared">${a.id}</span> <span class="pill ph-fam">Proposed</span></div><h2>${esc(a.title)}</h2>
+    <h3>Decision</h3><p>${esc(a.dec)}</p>
+    <h3>Options not chosen</h3><ul class="plain">${a.over.map(o=>`<li><b>${esc(o[0])}.</b> ${esc(o[1])}</li>`).join("")}</ul>
+    <h3>Why</h3><div class="key" style="border-color:var(--shared);background:var(--tint-shared)">${esc(a.why)}</div>
+    <h3>Revisit when</h3><p>${esc(a.revisit)}</p>
+    <h3>Source</h3><p style="font-family:var(--f-mono);font-size:12px">02_Product_and_Technical/ADR/${esc(a.src)}</p>
+    <h3>Other decisions</h3><div class="chips">${ROAD_ADRS.filter(x=>x.id!==a.id).map(x=>adrChip(x.id)).join("")}</div>`;
+  }
+  if(s.type==="rsplit"){
+    const st=S(s.n), r=ROAD_SPLIT[s.n], G=GATES[st.gate];
+    return `<div class="eyebrow">Step ${pad(st.n)} ${phPill(st.ph)} <span class="pill ph-gate">${st.gate}</span></div><h2>${esc(st.name)}</h2><p class="p-lead">Who does what, and why</p>
+    <h3>Automated, no model</h3><p>${esc(r.auto)}</p>
+    <h3>AI agents · ${st.agents.length}</h3><p>${esc(r.agent)}</p><p style="color:var(--muted)">Why an agent: ${esc(r.why)}</p>
+    <ul class="agents">${st.agents.map((a,i)=>`<li class="${i===0?"lead":""}" data-agent="${st.n}-${i}" tabindex="0"><b>${esc(a[0])}</b><span>${esc(a[1])}</span></li>`).join("")}</ul>
+    <h3>Person decides</h3><div class="gate-box"><b>${st.gate}</b><div><b style="font-family:var(--f-body);color:var(--ink)">${esc(G.name)}</b> · ${esc(G.who)}<br>${esc(G.what)}</div></div>
+    <h3>What the agents may see</h3><div class="key">${esc(r.sees)}</div>
+    <h3>Open the step</h3><div class="chips">${stepChip(st.n)}${gateChipR(st.gate)}</div>`;
+  }
+  if(s.type==="rlayer"){
+    const l=RL(s.k);
+    const pg=PLATFORM.find(g=>g.id===s.k);
+    return `<div class="eyebrow">Layer ${l.n} ${modeTag(l.mode)}</div><h2>${esc(l.name)}</h2><p class="p-lead">${esc(l.what)}</p>
+    <h3>Why this layer is ${l.mode==="auto"?"plain automation":l.mode==="agent"?"the only place a model runs":"people"}</h3><p>${esc(l.why)}</p>
+    <h3>Security and confidentiality</h3><div class="key">${esc(l.conf)}</div>
+    ${pg?`<h3>Components</h3><div class="chips">${pg.kids.map((k,i)=>`<button class="chip" data-pitem="${pg.id}-${i}">${esc(k[0])}</button>`).join("")}</div>`:s.k==="agents"?`<h3>Agent families</h3><div class="chips">${FAM_ORDER.map(famChip).join("")}</div>`:s.k==="people"?`<h3>The gates</h3><div class="chips">${Object.keys(GATES).map(gateChipR).join("")}</div>`:""}
+    <h3>Other layers</h3><div class="chips">${ROAD_LAYERS.filter(x=>x.k!==s.k).map(x=>layerChip(x.k)).join("")}</div>`;
+  }
+  return "";
+}
+
+/* ---- wiring ---- */
+function roadGo(sec){ show("road"); const el=document.getElementById(sec); if(el) setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"start"}),30); }
+// a chip inside a clickable card must not also select the card
+const innerChip=(e,b)=>{ const t=e.target&&e.target.closest?e.target.closest("button"):null; return !!(t&&t!==b&&b.contains(t)); };
+function wireRoadChips(rootEl){
+  const wire=(attr,mk)=>rootEl.querySelectorAll("["+attr+"]").forEach(b=>{ if(b.dataset.wired) return; b.dataset.wired="1";
+    b.addEventListener("click",e=>{ if(innerChip(e,b)) return; select(mk(b),true); });
+    b.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target===b){ e.preventDefault(); select(mk(b),true);} }); });
+  wire("data-rphase",b=>({type:"rphase",id:b.dataset.rphase}));
+  wire("data-adr",b=>({type:"adr",id:b.dataset.adr}));
+  wire("data-rlayer",b=>({type:"rlayer",k:b.dataset.rlayer}));
+  rootEl.querySelectorAll("[data-rsplit-open]").forEach(b=>{ if(b.dataset.wired) return; b.dataset.wired="1"; b.addEventListener("click",e=>{e.stopPropagation(); select({type:"rsplit",n:+b.dataset.rsplitOpen},true);}); });
+  rootEl.querySelectorAll("[data-road]").forEach(b=>{ if(b.dataset.wired) return; b.dataset.wired="1"; b.addEventListener("click",()=>roadGo(b.dataset.road)); });
+}
+function applyRoad(){
+  const s=selected;
+  document.querySelectorAll("#v-road [data-rphase]").forEach(el=>el.classList.toggle("on",s.type==="rphase"&&el.dataset.rphase===s.id));
+  document.querySelectorAll("#v-road .card[data-adr]").forEach(el=>el.classList.toggle("on",s.type==="adr"&&el.dataset.adr===s.id));
+  document.querySelectorAll("#v-road .layer[data-rlayer]").forEach(el=>el.classList.toggle("on",s.type==="rlayer"&&el.dataset.rlayer===s.k));
+  document.querySelectorAll("#v-road .srow[data-rsplit]").forEach(el=>el.classList.toggle("on",(s.type==="rsplit"||s.type==="step")&&+el.dataset.rsplit===s.n));
+}
+(function initRoad(){
+  renderRoad360(); renderRoadTimeline(); renderRoadSplit(); renderRoadAdr();
+  document.getElementById("road-ver").textContent=ROAD_VERSION;
+  const v=document.getElementById("v-road");
+  wireRoadChips(v);
+  // chips that reuse the map's own selection types
+  v.addEventListener("click",e=>{
+    const t=e.target.closest("[data-step],[data-gate],[data-gates],[data-stage],[data-fam],[data-pgroup],[data-pitem]");
+    if(!t||!v.contains(t)) return;
+    if(t.dataset.step) select({type:"step",n:+t.dataset.step},true);
+    else if(t.dataset.gate) select({type:"gate",g:t.dataset.gate},true);
+    else if(t.dataset.gates) select({type:"gates"},true);
+    else if(t.dataset.stage) select({type:"stage",id:t.dataset.stage},true);
+    else if(t.dataset.fam) select({type:"family",f:t.dataset.fam},true);
+    else if(t.dataset.pgroup) select({type:"pgroup",gid:t.dataset.pgroup},true);
+    else if(t.dataset.pitem){const [gid,i]=t.dataset.pitem.split("-"); select({type:"pitem",gid,i:+i},true);}
+  });
+  // the step rows: clicking the row body selects the step's split
+  v.querySelectorAll(".srow[data-rsplit]").forEach(row=>row.addEventListener("click",e=>{ if(e.target.closest("button,[data-agent]")) return; select({type:"rsplit",n:+row.dataset.rsplit},true); }));
+  // search index
+  ROAD_PHASES.forEach(p=>INDEX.push({label:"Roadmap: "+p.name,hint:p.when,sel:{type:"rphase",id:p.id}}));
+  ROAD_ADRS.forEach(a=>INDEX.push({label:a.id+" "+a.title,hint:"architecture decision",sel:{type:"adr",id:a.id}}));
+  ROAD_LAYERS.forEach(l=>INDEX.push({label:"Layer: "+l.name,hint:l.mode==="auto"?"automated, no model":l.mode==="agent"?"AI agents":"people",sel:{type:"rlayer",k:l.k}}));
+  STEPS.forEach(s=>INDEX.push({label:"Agents vs automation: "+pad(s.n)+" "+s.short,hint:"who does what",sel:{type:"rsplit",n:s.n}}));
+})();
+
 /* ===================== INIT ===================== */
 buildMatrix();
 updateTree(root);
 let initial={type:"root"};
 const m=(location.hash||"").match(/^#s(\d{2})$/); if(m&&+m[1]>=1&&+m[1]<=14) initial={type:"step",n:+m[1]};
-show("life");
+show((location.hash||"")==="#roadmap"?"road":"life");
 select(initial);
 window.addEventListener("resize",()=>{ if(currentView==="tree") fitTree(); });
 </script>
