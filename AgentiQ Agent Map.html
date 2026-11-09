@@ -380,7 +380,7 @@ ul.plain li{margin:2px 0}
   <header class="top">
     <div>
       <h1>AgentiQ — Agent Map</h1>
-      <p class="sub">AgentiQ, the controlled multi-agent platform for post-quantum migration: the 8-stage loop, the 7 AgentiQ agents and the 14 step teams that implement them, with what flows in and out, the human gates and the feedback loop. The Roadmap tab adds the project roadmap, the split between AI agents, plain automation and people, and the decisions behind the design. Click anything to see its details.</p>
+      <p class="sub">AgentiQ, the controlled multi-agent platform for the post-quantum migration of software: the 8-stage loop, the 7 AgentiQ agents and the 14 step teams that implement them, with what flows in and out, the human gates and the feedback loop. The Roadmap tab adds the project roadmap, the split between AI agents, plain automation and people, and the decisions behind the design. Click anything to see its details.</p>
     </div>
     <div class="legend" aria-label="Legend">
       <span><i class="dot" style="background:var(--prepare)"></i>Prepare</span>
@@ -465,9 +465,9 @@ const GATES={
   G1:{name:"Policy and budget",who:"CISO and board",what:"Approve the crypto policy, risk appetite, scope and budget.",steps:[1]},
   G2:{name:"Inventory and risk",who:"System owners and risk owners",what:"Attest that the CBOM is complete for their scope and confirm every high-risk asset.",steps:[2,3]},
   G3:{name:"Profiles and trust anchors",who:"Crypto architect and PKI owner",what:"Approve the algorithm profile catalogue, certificate policy changes and any new trust anchor.",steps:[4,6]},
-  G4:{name:"Contracts and conformity",who:"Procurement, legal and the product security officer",what:"Sign vendor contracts, choose the HSM platform and sign CRA declarations of conformity.",steps:[5,10]},
-  G5:{name:"Production changes",who:"Engineers, change board, identity architects, OT engineers",what:"Give go/no-go for pilots and approve every wave of production changes. On OT, safety comes before schedule.",steps:[7,8,11,12]},
-  G6:{name:"Key ceremonies and decommissioning",who:"Key custodians and system owners",what:"Root key ceremonies and HSM key work are done by people only; owners approve switching off classical algorithms.",steps:[9,13]},
+  G4:{name:"Contracts and conformity",who:"Procurement, legal and the product security officer",what:"Sign vendor contracts, approve vendor and library choices and sign CRA declarations of conformity.",steps:[5,10]},
+  G5:{name:"Production changes",who:"Engineers, change board, identity architects, application owners",what:"Give go/no-go for pilots and approve every wave of production changes. On legacy systems, data integrity comes before schedule.",steps:[7,8,11,12]},
+  G6:{name:"Key ceremonies and decommissioning",who:"Key custodians and system owners",what:"Root key ceremonies and key operations in the customer's HSM or KMS are done by people only; owners approve switching off classical algorithms.",steps:[9,13]},
   G7:{name:"Crypto incidents",who:"A named incident owner",what:"Declare a crypto incident and approve an emergency algorithm rotation.",steps:[14]}
 };
 const STEPS=[
@@ -480,14 +480,14 @@ const STEPS=[
   key:"The platform gets its own security review here, before any agent touches the estate. Every scan, even the quick scan, needs written authorization for its scope."},
  {n:2,ph:"prepare",name:"Discovery and CBOM",short:"Discovery and CBOM",gate:"G2",
   what:"Find every use of cryptography and record it in one live Cryptographic Bill of Materials.",
-  agents:[["Discovery Lead","Team lead. Plans scan coverage, merges results and publishes the CBOM."],["Code Scanner","Finds crypto calls in source code and dependencies."],["Binary Analyst","Finds crypto in compiled binaries and firmware."],["Network Scanner","Runs active TLS, SSH and IPsec scans."],["Passive Traffic Analyst","Reads captured traffic, including OT protocols, without touching devices."],["PKI/HSM/KMS Connector","Reads certificates, key metadata and CA hierarchies."],["Config Parser","Reads server, VPN, load-balancer and application configs."],["Datasheet Reader","Fills gaps from vendor documents, marked as inferred with a confidence score."],["Inventory Reconciler","Deduplicates, links endpoints into connections and scores confidence."]],
+  agents:[["Discovery Lead","Team lead. Plans scan coverage, merges results and publishes the CBOM."],["Code Scanner","Finds crypto calls in source code and dependencies."],["Binary Analyst","Finds crypto in compiled binaries and container images."],["Network Scanner","Runs active TLS, SSH and IPsec scans."],["Passive Traffic Analyst","Reads captured TLS and SSH traffic without touching the endpoints."],["PKI/HSM/KMS Connector","Reads certificates, key metadata and CA hierarchies."],["Config Parser","Reads server, VPN, load-balancer and application configs."],["Datasheet Reader","Fills gaps from vendor documents, marked as inferred with a confidence score."],["Inventory Reconciler","Deduplicates, links endpoints into connections and scores confidence."]],
   inputs:["Approved scope from 01","Network ranges","Repository access","Read-only connectors (PKI, HSM, KMS, cloud)","Vendor documents","change.deployed events (rescan)"],
   outputs:["CBOM graph (CycloneDX 1.6/1.7) with endpoints and links","Coverage report","Low-confidence review queue"],
   from:[1,6,8,9,11,12,13],to:[3,4,5,6,7,9,10,11,12,13,14],pub:["cbom.updated"],sub:["scope.approved","change.deployed","downgrade.detected"],
-  key:"OT is passive-only by default, because active scans can crash fragile devices. TLS 1.3 hides certificates from passive capture, so pair passive with active scans. The CBOM maps the weakest points and is stored like a crown-jewel secret."},
+  key:"The software estate is the only target: code, dependencies, configurations, endpoints, PKI and cloud services, and every scan stays inside the scope contract. TLS 1.3 hides certificates from passive capture, so pair passive with active scans. The CBOM maps the weakest points and is stored like a crown-jewel secret."},
  {n:3,ph:"prepare",name:"Risk and dependency map",short:"Risk and dependencies",gate:"G2",
   what:"Rank every link by quantum exposure and map what blocks what.",
-  agents:[["Risk Lead","Team lead. Runs scoring and clustering and builds the G2 risk pack."],["Q-Day Scenario Modeler","Turns the threat feed from 14 into Q-Day scenarios for scoring."],["Data Classification Agent","Assigns data shelf-life and value per system."],["Exposure Scorer","Computes link-level exposure for confidentiality and OT safety."],["Dependency Mapper","Finds what blocks what: libraries, HSMs, CAs, partners."],["Cluster Planner","Splits the graph into migration clusters by calling the optimizer."]],
+  agents:[["Risk Lead","Team lead. Runs scoring and clustering and builds the G2 risk pack."],["Q-Day Scenario Modeler","Turns the threat feed from 14 into Q-Day scenarios for scoring."],["Data Classification Agent","Assigns data shelf-life and value per system."],["Exposure Scorer","Computes link-level exposure for confidentiality and integrity."],["Dependency Mapper","Finds what blocks what: libraries, HSMs, CAs, partners."],["Cluster Planner","Splits the graph into migration clusters by calling the optimizer."]],
   inputs:["CBOM from 02","Risk appetite from 01","Data classification","Threat scenarios from 14"],
   outputs:["Risk register","Dependency graph","Migration clusters","Exposure baseline","External blockers list"],
   from:[1,2,14],to:[4,5,8,9,12],pub:["risk.scored","clusters.ready"],sub:["cbom.updated","scope.approved","threat.updated"],
@@ -499,13 +499,13 @@ const STEPS=[
   outputs:["Profile catalogue (policy-as-code)","Endpoint-to-profile map","Agility layer specification"],
   from:[1,2,3,7,14],to:[5,6,7,8,9,10,11,12,14],pub:["profiles.approved"],sub:["cbom.updated","scope.approved","risk.scored","test.result","threat.updated"],
   key:"Use algorithms exactly as standardized and never implement cryptography: wrap production libraries such as OpenSSL 3.5+, BoringSSL or AWS-LC."},
- {n:5,ph:"prepare",name:"Supply chain, HSMs and procurement",short:"Supply chain and HSMs",gate:"G4",
-  what:"Get vendors, HSMs and contracts ready, and stop buying quantum-vulnerable systems.",
-  agents:[["Vendor Lead","Team lead. Owns the vendor register and the G4 pack."],["Vendor Intelligence Agent","Tracks each supplier's PQC roadmap and real support."],["Certification Tracker","Follows NIST CAVP and CMVP (FIPS 140-3) status."],["Contract Drafter","Writes PQC contract clauses and RFP questions."],["HSM Capability Tester","Checks PKCS#11 v3.2 and KMIP support in the lab."]],
-  inputs:["Vendor components from the CBOM (02)","Critical vendors from 03","Profiles from 04","Budget from 01"],
+ {n:5,ph:"prepare",name:"Software supply chain and vendors",short:"Supply chain and vendors",gate:"G4",
+  what:"Get the libraries, runtimes, SaaS and cloud providers you depend on ready, with dated commitments, and stop buying quantum-vulnerable software.",
+  agents:[["Vendor Lead","Team lead. Owns the vendor register and the G4 pack."],["Vendor Intelligence Agent","Tracks each supplier's PQC roadmap and real support: libraries, frameworks, runtimes, SaaS, cloud and identity providers."],["Certification Tracker","Follows NIST CAVP and CMVP (FIPS 140-3) status of the software crypto modules in use, such as the OpenSSL FIPS provider."],["Contract Drafter","Writes PQC contract clauses and RFP questions."],["Dependency Readiness Tester","Proves in the lab whether a library or runtime version negotiates the hybrid and post-quantum profiles."]],
+  inputs:["Libraries, runtimes and vendor components from the CBOM (02)","Critical vendors from 03","Profiles from 04","Budget from 01"],
   outputs:["Vendor readiness register with dated commitments","Contract clauses","Slip alerts"],
   from:[1,2,3,4],to:[8,9,10,12],pub:["vendor.date_changed"],sub:["cbom.updated","scope.approved","risk.scored","profiles.approved"],
-  key:"Vendor dates are constraints for the scheduler, not notes in a spreadsheet. Prove HSM support in the lab, not from a datasheet."},
+  key:"Vendor dates are constraints for the scheduler, not notes in a spreadsheet. Prove a library's PQC support in the lab, not from a release note."},
  {n:6,ph:"migrate",name:"Certificate lifecycle automation",short:"Certificates",gate:"G3",
   what:"Automate issuing and renewing every certificate, internal ones included.",
   agents:[["PKI Automation Lead","Team lead. Owns onboarding progress and the G3 pack."],["Certificate Discovery Agent","Keeps the certificate list complete, internal ones included."],["ACME Onboarding Agent","Moves each certificate to automated issuance and renewal."],["Renewal Operator","Runs renewals inside the approved policy."],["Policy Switcher","Changes algorithms by policy on the next renewal."]],
@@ -515,8 +515,8 @@ const STEPS=[
   key:"Onboarding starts right after 02; algorithm switches wait for profiles (04) and plan slots (08). Public TLS lifetimes fall to 47 days by March 2029, so this step pays for itself even before PQC."},
  {n:7,ph:"migrate",name:"Test, repair and pilots",short:"Test and repair",gate:"G5",
   what:"Find what breaks before it reaches production, repair it and retest: the Test ⇋ Repair loop.",
-  agents:[["Test Lead","Team lead. Owns the test plan, the Test ⇋ Repair loop and the go/no-go packs."],["Twin Builder","Builds a lab copy of real network paths from the CBOM."],["Test Matrix Designer","Picks the smallest test set covering stack, device, path and profile."],["Test Runner","Runs handshake, MTU, fragmentation, latency and interop tests."],["Build Verifier","Builds changed code in the controlled workspace and runs its unit tests, integration tests and known-answer test vectors."],["Side-Channel Checker","Runs fuzzing and constant-time checks."],["Failure Triage Agent","Reports each failure with the exact path that broke."],["Repair Agent","Diagnoses each failed transformation, proposes a corrective change and sends it back for retest. After repeated failures it escalates to a person."],["Capacity Planner","Measures the CPU, bandwidth, storage and HSM-throughput cost of larger keys and signatures."]],
-  inputs:["Paths and devices from the CBOM (02)","Profiles from 04","Candidate changes from 08, 09, 11, 12"],
+  agents:[["Test Lead","Team lead. Owns the test plan, the Test ⇋ Repair loop and the go/no-go packs."],["Twin Builder","Builds a lab copy of real network paths from the CBOM."],["Test Matrix Designer","Picks the smallest test set covering stack, runtime, path and profile."],["Test Runner","Runs handshake, MTU, fragmentation, latency and interop tests."],["Build Verifier","Builds changed code in the controlled workspace and runs its unit tests, integration tests and known-answer test vectors."],["Side-Channel Checker","Runs fuzzing and constant-time checks."],["Failure Triage Agent","Reports each failure with the exact path that broke."],["Repair Agent","Diagnoses each failed transformation, proposes a corrective change and sends it back for retest. After repeated failures it escalates to a person."],["Capacity Planner","Measures the CPU, memory, bandwidth and storage cost of larger keys and signatures."]],
+  inputs:["Paths, stacks and runtimes from the CBOM (02)","Profiles from 04","Candidate changes from 08, 09, 11, 12"],
   outputs:["Pass/fail per profile and path","Repair proposals (repair.proposed)","Known issues","Measured durations and p99 latency"],
   from:[2,4,6,8,9,11,12],to:[4,8,9,11,12],pub:["test.result","repair.proposed"],sub:["cbom.updated","profiles.approved","change.rolled_back"],
   key:"Measure p99, not averages. An ML-KEM key share adds over a kilobyte to the TLS ClientHello and can break middleboxes. A repair is just another change: it goes through the same tests and the same gate."},
@@ -528,19 +528,19 @@ const STEPS=[
   from:[3,4,5,7,12,13,14],to:[2,6,7,9,11,12,13,14],pub:["plan.proposed","plan.approved","change.deployed","change.rolled_back"],sub:["risk.scored","clusters.ready","profiles.approved","vendor.date_changed","test.result","repair.proposed","downgrade.detected","threat.updated","incident.declared"],
   key:"Hybrid key exchange protects new sessions only; long-lived secrets that already crossed old links must be rotated."},
  {n:9,ph:"migrate",name:"Wave 2: private PKI and signing",short:"Wave 2: PKI and signing",gate:"G6",
-  what:"Move your own certificate authorities, code signing and firmware signing to post-quantum signatures.",
-  agents:[["PKI Migration Lead","Team lead. Owns the trust rollout and the G6 pack."],["Relying-Party Mapper","Finds every client and device that trusts each CA."],["Trust Rollout Planner","Orders trust-anchor distribution with the scheduler."],["Chain Configurator","Prepares composite or parallel chain configurations."],["Ceremony Preparer","Writes scripts and checklists that people execute."]],
-  inputs:["CA hierarchy and relying parties from 02 and 06","Risk from 03","Profiles from 04","HSM readiness from 05","Plan from 08"],
+  what:"Move your own certificate authorities, code signing and artifact and container signing to post-quantum signatures.",
+  agents:[["PKI Migration Lead","Team lead. Owns the trust rollout and the G6 pack."],["Relying-Party Mapper","Finds every client, service and runtime that trusts each CA."],["Trust Rollout Planner","Orders trust-anchor distribution with the scheduler."],["Chain Configurator","Prepares composite or parallel chain configurations."],["Ceremony Preparer","Writes scripts and checklists that people execute."]],
+  inputs:["CA hierarchy and relying parties from 02 and 06","Risk from 03","Profiles from 04","Vendor and library readiness from 05","Plan from 08"],
   outputs:["Trust-anchor rollout plan","Chain configurations","Signing-pipeline changes","Ceremony checklists"],
   from:[2,3,4,5,6,7,8],to:[2,7,10,11,13],pub:["change.deployed"],sub:["risk.scored","profiles.approved","vendor.date_changed","plan.approved","test.result","repair.proposed"],
   key:"Stateful signatures (LMS, XMSS) must never reuse a one-time key, and their state is never restored from backup. Agents never hold or touch private keys."},
- {n:10,ph:"migrate",name:"Product track: EU Cyber Resilience Act",short:"CRA products",gate:"G4",
-  what:"Keep every product sold in the EU compliant, with an update path that can change its cryptography.",
-  agents:[["Product Compliance Lead","Team lead. Owns each product's conformity pack."],["SBOM/CBOM Mapper","Maps product components to CRA requirements."],["Boot Chain Reviewer","Flags designs without post-quantum signature verification."],["Documentation Writer","Drafts the technical documentation."]],
-  inputs:["Product SBOMs and CBOMs from 02","Profiles from 04","Vendor status from 05","Firmware signing from 09"],
+ {n:10,ph:"migrate",name:"Software products and SDKs: EU Cyber Resilience Act",short:"CRA software products",gate:"G4",
+  what:"Keep every software product, SDK and library sold in the EU compliant, with an update path that can change its cryptography.",
+  agents:[["Product Compliance Lead","Team lead. Owns each product's conformity pack."],["SBOM/CBOM Mapper","Maps each software product's components and dependencies to CRA requirements."],["Update-Path Reviewer","Flags products whose update mechanism cannot change algorithms or verify post-quantum signatures."],["Documentation Writer","Drafts the technical documentation."]],
+  inputs:["Product SBOMs and CBOMs from 02","Profiles from 04","Vendor status from 05","Artifact signing from 09"],
   outputs:["Gap report per product","Documentation drafts","Update-path test results"],
   from:[2,4,5,9],to:[13],pub:[],sub:["cbom.updated","profiles.approved","vendor.date_changed"],
-  key:"Runs in parallel from 02 onward. Boot ROMs cannot change after shipping, so designs made now must already verify PQC signatures. CRA obligations apply from 11 December 2027."},
+  key:"Runs in parallel from 02 onward. A product shipped without an update path that can change its algorithms cannot be fixed later, so the update path is designed and tested first. CRA obligations apply from 11 December 2027."},
  {n:11,ph:"migrate",name:"Identity, applications and the public web",short:"Identity and apps",gate:"G5",
   what:"Migrate the layers above the network: tokens, single sign-on, email signing and public HTTPS.",
   agents:[["Application Lead","Team lead. Owns app and identity changes."],["Code Refactor Agent","Moves application crypto calls behind the agility layer with repository-aware changes, made and tested in the controlled workspace."],["Protocol Specialist","Handles JWT, OAuth, SAML, Kerberos and S/MIME."],["Release-Day Watcher","Pre-stages switches for when CAs, browsers and identity providers support PQC."]],
@@ -548,13 +548,13 @@ const STEPS=[
   outputs:["Refactoring pull requests","Identity provider roadmap","Pre-staged switches"],
   from:[2,4,6,7,8,9,14],to:[2,7,13],pub:["change.deployed"],sub:["cbom.updated","profiles.approved","plan.approved","test.result","repair.proposed"],
   key:"Short-lived tokens face no harvest-now risk and can follow wave 1; long-lived signatures cannot wait."},
- {n:12,ph:"migrate",name:"Data at rest, OT and the long tail",short:"Data, OT, long tail",gate:"G5",
-  what:"Re-protect stored data and deal with devices that cannot be upgraded.",
-  agents:[["Long-Tail Lead","Team lead. Owns the non-upgradable list and the G5 OT packs."],["Key Re-wrap Planner","Plans re-wrapping of stored keys and flags full re-encryption."],["Legacy Device Registrar","Tracks devices that cannot upgrade, with replacement dates."],["Gateway Placement Agent","Calls the optimizer to cover legacy devices with PQC gateways."],["OT Safety Reviewer","Pre-checks every OT change against safety rules."]],
-  inputs:["OT and storage entries from the CBOM (02)","Exposure from 03","Profiles from 04","Vendor dates from 05","Plan from 08"],
-  outputs:["Re-wrap jobs","Gateway placement plan","Replacement schedule fed back to 08"],
+ {n:12,ph:"migrate",name:"Data at rest and legacy applications",short:"Data and legacy apps",gate:"G5",
+  what:"Re-protect stored data and shield or retire the applications that cannot be upgraded.",
+  agents:[["Long-Tail Lead","Team lead. Owns the legacy-application list and the G5 long-tail packs."],["Key Re-wrap Planner","Plans re-wrapping of stored keys inside the KMS and flags data that needs full re-encryption."],["Legacy Application Registrar","Tracks applications that cannot upgrade, with a shield or a funded retirement date."],["Proxy Placement Agent","Calls the optimizer to cover legacy applications with the fewest TLS proxies, sidecars and API gateways."],["Legacy Change Reviewer","Pre-checks every change to a legacy system for compatibility and data-integrity risk."]],
+  inputs:["Storage and legacy-application entries from the CBOM (02)","Exposure from 03","Profiles from 04","Vendor dates from 05","Plan from 08"],
+  outputs:["Re-wrap jobs","Proxy placement plan","Retirement schedule fed back to 08"],
   from:[2,3,4,5,7,8],to:[2,7,8,13],pub:["change.deployed"],sub:["cbom.updated","risk.scored","profiles.approved","vendor.date_changed","plan.approved","test.result","repair.proposed"],
-  key:"Symmetric encryption survives; the exposure is the key exchange. Gateways add latency and a single point of failure, so build them redundant."},
+  key:"Symmetric encryption survives; the exposure is the key exchange. Proxies add latency and a single point of failure, so build them redundant."},
  {n:13,ph:"sustain",name:"Verify, decommission and enforce",short:"Verify and decommission",gate:"G6",
   what:"Prove the migration is complete and switch off the old algorithms.",
   agents:[["Verification Lead","Team lead. Owns completeness proof and the G6 decommission pack."],["Traffic Monitor","Watches live handshakes for classical-only sessions."],["Downgrade Detector","Flags fallbacks and downgrade attempts."],["Evidence Compiler","Builds audit packs mapped to the EU roadmap, NIST, NIS2 and DORA."],["Decommission Planner","Stages the switch-off of classical algorithms, with exceptions."]],
@@ -571,18 +571,18 @@ const STEPS=[
   key:"Agility you never exercise does not exist: drill a full algorithm rotation at least once a year."}
 ];
 const EXTRA={
- 1:{when:"Now – Q1 2027",issue:"PQC sits between security, IT, OT and procurement, so nobody owns it. The few crypto experts are already busy running PKI and HSMs.",bt:"Internal",bn:"About half of organizations report a PQC skills gap, and only 38% are actively preparing.",done:"A named owner, a multi-year budget line and an approved policy exist, in time for the EU's end-2026 first milestone."},
- 2:{when:"2026 – 2027",issue:"Crypto hides in source code, binaries, configs, appliances, vendor products and OT protocols. Hand-built inventories go stale within months.",bt:"Mixed",bn:"Scanners miss binaries, firmware and OT traffic, and few vendors deliver a CBOM yet.",done:"Every in-scope system has an owner-attested CBOM entry, and the share of unknown or inferred entries is tracked and falling."},
- 3:{when:"2026 – 2027",issue:"Thousands of findings and no order to work them in. Nobody knows which system cannot move until its library, HSM, CA or partner moves first.",bt:"External",bn:"The threat clock keeps moving: Google's March 2026 estimate puts 256-bit elliptic curves under 500,000 physical qubits.",done:"Every high-risk asset has a cluster and a target date, and every external blocker has a named person tracking it."},
- 4:{when:"2027",issue:"Each link and device has different limits: packet size, CPU, latency, compliance regime. One global setting breaks constrained devices or under-protects critical ones.",bt:"External",bn:"Standards are still moving: FN-DSA and HQC are drafts, and composite certificates and PQC for JOSE/COSE are IETF drafts.",done:"Every endpoint type maps to a profile, and the agility layer is proven by swapping one algorithm in the lab without code changes."},
- 5:{when:"Now – 2028",issue:"Most of the migration is vendor upgrades the organization does not control, tracked in emails and spreadsheets.",bt:"External",bn:"HSM support is uneven, cross-vendor key migration is painful, and FIPS 140-3 validation backlogs exceed 500 days.",done:"Every critical vendor has a dated, contractual PQC commitment, and HSM PQC support is proven in the lab."},
+ 1:{when:"Now – Q1 2027",issue:"PQC sits between security, development, IT operations and procurement, so nobody owns it. The few crypto experts are already busy running PKI and key management.",bt:"Internal",bn:"About half of organizations report a PQC skills gap, and only 38% are actively preparing.",done:"A named owner, a multi-year budget line and an approved policy exist, in time for the EU's end-2026 first milestone."},
+ 2:{when:"2026 – 2027",issue:"Crypto hides in source code, dependencies, binaries, configurations, cloud services and vendor products. Hand-built inventories go stale within months.",bt:"Mixed",bn:"Scanners miss compiled binaries, vendored libraries and configuration, and few vendors deliver a CBOM yet.",done:"Every in-scope system has an owner-attested CBOM entry, and the share of unknown or inferred entries is tracked and falling."},
+ 3:{when:"2026 – 2027",issue:"Thousands of findings and no order to work them in. Nobody knows which system cannot move until its library, runtime, CA or partner moves first.",bt:"External",bn:"The threat clock keeps moving: Google's March 2026 estimate puts 256-bit elliptic curves under 500,000 physical qubits.",done:"Every high-risk asset has a cluster and a target date, and every external blocker has a named person tracking it."},
+ 4:{when:"2027",issue:"Each link and endpoint has different limits: packet size, CPU, latency, compliance regime. One global setting breaks old clients and runtimes or under-protects critical ones.",bt:"External",bn:"Standards are still moving: FN-DSA and HQC are drafts, and composite certificates and PQC for JOSE/COSE are IETF drafts.",done:"Every endpoint type maps to a profile, and the agility layer is proven by swapping one algorithm in the lab without code changes."},
+ 5:{when:"Now – 2028",issue:"Most of the migration is vendor upgrades the organization does not control, tracked in emails and spreadsheets.",bt:"External",bn:"Library and runtime support is uneven, SaaS and identity providers publish few dates, and FIPS 140-3 validation backlogs exceed 500 days.",done:"Every critical vendor has a dated, contractual PQC commitment, and every critical library's PQC support is proven in the lab."},
  6:{when:"2026 – 2028",issue:"Many certificates are still renewed by hand, and expired certificates remain a common cause of outages.",bt:"Internal",bn:"Public TLS validity falls to 200 days (March 2026), 100 days (March 2027) and 47 days (March 2029).",done:"Every public certificate renews without a person, and one algorithm change has been rolled out by policy in a test domain."},
- 7:{when:"2027",issue:"Larger keys and signatures break buffers, MTU limits, constrained devices and old client libraries.",bt:"Mixed",bn:"An ML-KEM key share adds over a kilobyte to the TLS ClientHello, and new implementations can leak through timing side channels.",done:"Every profile passes on every path class in the lab, every failure has a tested repair or a named owner, and production pilots have run with a tested rollback."},
- 8:{when:"2027 – 2029",issue:"Traffic recorded today can be decrypted later, so every month of delay adds to the exposed archive.",bt:"External",bn:"Both ends of a connection must upgrade, so partners and legacy appliances set the pace.",done:"Live traffic shows every high-risk confidentiality link negotiating hybrid key exchange."},
- 9:{when:"2028 – 2030",issue:"Every client, device and service that trusts your CA must receive the new trust anchor before you can rely on it.",bt:"Mixed",bn:"Trust-store distribution takes years, HSM support for ML-DSA keys is recent, and legacy software cannot parse the new certificates.",done:"The new post-quantum trust anchors are on every relying party before the first post-quantum-only certificate is issued."},
- 10:{when:"Now – Dec 2027",issue:"Products designed in 2026 will still be in the field in 2035, often with cryptography fixed in hardware.",bt:"Internal",bn:"Boot ROMs and secure elements cannot change after shipping, and most CRA obligations apply from 11 December 2027.",done:"Each product has a CBOM, an algorithm-update mechanism tested end to end, and a chosen conformity-assessment route."},
+ 7:{when:"2027",issue:"Larger keys and signatures break buffers, MTU limits, middleboxes and old client libraries and runtimes.",bt:"Mixed",bn:"An ML-KEM key share adds over a kilobyte to the TLS ClientHello, and new implementations can leak through timing side channels.",done:"Every profile passes on every path class in the lab, every failure has a tested repair or a named owner, and production pilots have run with a tested rollback."},
+ 8:{when:"2027 – 2029",issue:"Traffic recorded today can be decrypted later, so every month of delay adds to the exposed archive.",bt:"External",bn:"Both ends of a connection must upgrade, so partners and legacy applications set the pace.",done:"Live traffic shows every high-risk confidentiality link negotiating hybrid key exchange."},
+ 9:{when:"2028 – 2030",issue:"Every client, service and runtime that trusts your CA must receive the new trust anchor before you can rely on it.",bt:"Mixed",bn:"Trust-store distribution takes years, ML-DSA support in CA software and key managers is recent, and legacy software cannot parse the new certificates.",done:"The new post-quantum trust anchors are on every relying party before the first post-quantum-only certificate is issued."},
+ 10:{when:"Now – Dec 2027",issue:"Software products and SDKs shipped in 2026 will still be in use in 2035, often with cryptography fixed at build time.",bt:"Internal",bn:"A shipped product can change its cryptography only through its update path, and most CRA obligations apply from 11 December 2027.",done:"Each product has a CBOM, an algorithm-update mechanism tested end to end, and a chosen conformity-assessment route."},
  11:{when:"2027 – 2031",issue:"JWT, OAuth, SAML, Kerberos, S/MIME and FIDO each carry their own cryptography, often deep in application code.",bt:"External",bn:"No publicly trusted post-quantum certificate exists yet, and identity providers and DNSSEC lag behind.",done:"Application crypto goes through the agility layer, and each identity provider has a dated PQC roadmap."},
- 12:{when:"2029 – 2035",issue:"Archives sit behind keys wrapped with RSA or ECDH, and controllers, meters and medical devices run for 15 to 30 years.",bt:"External",bn:"Vendor-controlled firmware and tight real-time latency budgets mean many devices get replaced, not patched.",done:"Every long-lived archive has quantum-safe key protection, and every non-upgradable device is shielded or has a funded replacement date."},
+ 12:{when:"2029 – 2035",issue:"Archives sit behind keys wrapped with RSA or ECDH, and legacy applications with no vendor or no source code run for 15 to 30 years.",bt:"External",bn:"Unsupported runtimes and frozen binaries mean many legacy applications get shielded or retired, not patched.",done:"Every long-lived archive has quantum-safe key protection, and every legacy application that cannot upgrade is shielded or has a funded retirement date."},
  13:{when:"2030 – 2035",issue:"Classical fallbacks stay enabled long after migration and allow downgrade attacks. Auditors and supervisors ask for proof.",bt:"Internal",bn:"Proving completeness is often harder than the migration itself.",done:"No classical-only handshake appears on high-risk systems for a full audit period, with evidence to show it."},
  14:{when:"Ongoing",issue:"If a PQC algorithm is broken or Q-Day comes early, most organizations would face a second multi-year migration.",bt:"Internal",bn:"Almost no organization has a crypto incident playbook or can rotate an algorithm fleet-wide.",done:"A full algorithm-rotation drill finishes inside the target window, at least once a year."}
 };
@@ -593,7 +593,7 @@ const PLATFORM=[
   ["Gate service","Routes each gate request with its evidence to the named approver and blocks the team until a decision."],
   ["Safety guard","Checks every proposed action against policy-as-code before it can reach a gate or the estate."],
   ["Evidence ledger","Signed, append-only log of every action and approval: audit evidence by default."],
-  ["Secrets boundary","Brokers credentials per call. Agents never see secrets, and private keys never leave HSMs."],
+  ["Secrets boundary","Brokers credentials per call. Agents never see secrets, and private keys never leave the customer's HSM or KMS."],
   ["Tool gateway","MCP servers exposing tools with least-privilege scopes. Agents call engines only through it."],
   ["Console","Where people work: gate inbox, CBOM explorer, plan view, exposure dashboard and evidence."],
   ["Controlled workspace","Isolated sandbox where agents change code and configurations, build and test them, before anything becomes a change request. Nothing in it touches production."]]},
@@ -610,7 +610,6 @@ const PLATFORM=[
   ["CMDB and asset inventory","Existing asset records used to seed and cross-check the CBOM."],
   ["SIEM and network monitoring","Live handshake and traffic data for verification and downgrade detection."],
   ["Cloud providers","Cloud load balancers, gateways and key services."],
-  ["OT historians and network taps","Passive OT traffic and asset data, without touching field devices."],
   ["ERP and internal security tools","ERP systems and existing security tools, connected through integration services."]]},
  {id:"world",name:"Shared world model",desc:"One set of stores every team reads and writes, so nothing is copied or goes stale between steps.",kids:[
   ["CBOM graph","Endpoints, links and algorithms in CycloneDX form, with confidence and provenance on every entry."],
@@ -619,7 +618,7 @@ const PLATFORM=[
   ["Plan store","The current migration plan, its waves and every re-plan."],
   ["Evidence store","Gate decisions, test results and audit packs."]]},
  {id:"engines",name:"Deterministic engines",desc:"The ground truth. No LLM code: agents interpret, engines produce facts.",kids:[
-  ["Scanners","Code, binary, active network, passive network, PKI, config and OT scanners."],
+  ["Scanners","Code, dependency, binary, active network, passive network, PKI and configuration scanners."],
   ["CBOM builder","Builds, merges and imports/exports CycloneDX CBOMs."],
   ["Risk engine","Exposure scoring, dependency graph and clustering."],
   ["Optimizer","CP-SAT baseline, large-neighbourhood search, quantum-inspired solvers (used only where they win) and the re-planner."],
@@ -642,9 +641,9 @@ const FAMS={
 };
 const STEP_FAM={1:"governance",2:"discovery",3:"risk",4:"planning",5:"planning",6:"transformation",7:"validation",8:"transformation",9:"transformation",10:"governance",11:"transformation",12:"transformation",13:"validation",14:"governance"};
 const AGENT_FAM={"Quick-Scan Agent":"discovery","Certificate Discovery Agent":"discovery","Relying-Party Mapper":"discovery",
- "Scheduler Agent":"planning","Partner Liaison":"planning","Secret Rotation Planner":"planning","Trust Rollout Planner":"planning","Key Re-wrap Planner":"planning","Gateway Placement Agent":"planning","Decommission Planner":"planning","Emergency Re-planner":"planning",
+ "Scheduler Agent":"planning","Partner Liaison":"planning","Secret Rotation Planner":"planning","Trust Rollout Planner":"planning","Key Re-wrap Planner":"planning","Proxy Placement Agent":"planning","Decommission Planner":"planning","Emergency Re-planner":"planning",
  "Repair Agent":"repair","Failure Triage Agent":"repair","Rollback Guardian":"repair",
- "HSM Capability Tester":"validation","Boot Chain Reviewer":"validation","OT Safety Reviewer":"validation",
+ "Dependency Readiness Tester":"validation","Update-Path Reviewer":"validation","Legacy Change Reviewer":"validation",
  "Evidence Compiler":"governance"};
 const famOf=(n,i)=>AGENT_FAM[S(n).agents[i][0]]||STEP_FAM[n];
 const famAgents=f=>{const r=[]; STEPS.forEach(s=>s.agents.forEach((a,i)=>{if(famOf(s.n,i)===f) r.push({n:s.n,i});})); return r;};
@@ -678,14 +677,14 @@ const DOCS={
  model:{title:"Business model",lead:"Enterprise software, complemented by implementation and validation services.",
   rows:[["Paid pilot","Scoped assessment and controlled migration of a selected application or environment.","Steps 01–07 and one wave on the chosen scope",[1,2,3,4,7]],
         ["Platform licence","Annual enterprise licence for discovery, migration orchestration, validation and monitoring.","Discovery, the scheduler, validation and monitoring",[2,8,13,14]],
-        ["Integration","Professional services for CI/CD, PKI, HSM, cloud, ERP or internal security-tool integration.","The Integrations group of the shared platform",[]],
+        ["Integration","Professional services for CI/CD, PKI, KMS, cloud, ERP or internal security-tool integration.","The Integrations group of the shared platform",[]],
         ["Lifecycle service","Continuous cryptographic monitoring, policy updates and migration support.","Monitor stage: steps 13 and 14, profile updates in 04",[13,14,4]]]},
  consortium:{title:"Founding consortium",lead:"Partner expertise from the concept note. Which part of the map each partner could own is a suggestion.",
   rows:[["Partner 1","PQC standards, quantum computing and technical/product leadership.","Profiles and standards (04), risk and Q-Day modelling (03), optimizer",[3,4]],
         ["Partner 2","Agentic AI architecture and multi-agent orchestration.","Platform services and agent safety",[]],
         ["Partner 3","Cybersecurity, applied cryptography and security validation.","Discovery (02), testing (07), verification (13)",[2,7,13]],
         ["Partner 4","AI/software engineering, program analysis and autonomous code repair.","Transformation and Repair agents, controlled workspace (07, 11)",[7,11]],
-        ["Partner 5","Industrial use case, pilot environment and operational validation.","Pilot validation, OT and the long tail (12)",[12]]]}
+        ["Partner 5","Enterprise software use case, pilot environment and operational validation.","Pilot validation, data at rest and legacy applications (12)",[12]]]}
 };
 /* ===================== WALKTHROUGH CONTENT (per step) ===================== */
 const WT={
@@ -697,14 +696,14 @@ const WT={
   status:"Unknown estate: only a few assets are known",
   log:[["Quick-Scan Agent","Read-only sample scan under written authorization"],["Regulatory Analyst","Obligations mapped: EU roadmap, CRA, NIS2, DORA, NIST, each cited"],["Business Case Writer","Exposure, effort and cost of delay estimated"],["Policy Drafter","Crypto policy v0.1 written as policy-as-code"],["Program Lead","G1 pack sent for approval","gate.requested"]]},
  2:{win:[2026.78,2027.99],lead:"A discovery swarm that never stops scanning.",
-  ag:"Deterministic scanners are the ground truth: the Code Scanner and Binary Analyst read source, binaries and firmware; the Network Scanner runs active TLS, SSH and IPsec scans; the Passive Traffic Analyst reads captures, including OT protocols (Modbus, DNP3, OPC UA, IEC 61850); the PKI/HSM/KMS Connector and Config Parser read metadata and configs. The Datasheet Reader fills gaps from vendor documents, marking every entry inferred with a confidence score. The Inventory Reconciler merges everything into one CycloneDX CBOM (1.6, standardized as ECMA-424, or 1.7) of endpoints and links.",
+  ag:"Deterministic scanners are the ground truth: the Code Scanner and Binary Analyst read source, dependencies, compiled binaries and container images; the Network Scanner runs active TLS, SSH and IPsec scans; the Passive Traffic Analyst reads TLS and SSH captures; the PKI/HSM/KMS Connector and Config Parser read metadata and configs. The Datasheet Reader fills gaps from vendor documents, marking every entry inferred with a confidence score. The Inventory Reconciler merges everything into one CycloneDX CBOM (1.6, standardized as ECMA-424, or 1.7) of endpoints and links.",
   opt:null,optNo:"Not needed: discovery is scanning, not optimization.",
   watch:"TLS 1.3 encrypts certificates, so passive capture shows the key-exchange group but not the certificate chain. Pair it with active scans. Store the CBOM like a crown-jewel secret.",
   gate:{who:"System owners",d:"Attest completeness; review every low-confidence entry."},
   status:"Scanning: building the CBOM",
-  log:[["Discovery Lead","Coverage planned from the approved scope","scope.approved"],["Network Scanner","Active TLS, SSH and IPsec scans of reachable endpoints"],["Code Scanner","Crypto found in libraries, source and firmware"],["Datasheet Reader","Gaps filled from vendor documents, each marked inferred"],["Inventory Reconciler","Endpoints linked into connections; CBOM published","cbom.updated"]]},
+  log:[["Discovery Lead","Coverage planned from the approved scope","scope.approved"],["Network Scanner","Active TLS, SSH and IPsec scans of reachable endpoints"],["Code Scanner","Crypto found in libraries, source and container images"],["Datasheet Reader","Gaps filled from vendor documents, each marked inferred"],["Inventory Reconciler","Endpoints linked into connections; CBOM published","cbom.updated"]]},
  3:{win:[2026.78,2027.99],lead:"Turn the CBOM into a graph and cut it into pieces that can move on their own.",
-  ag:"The Data Classification Agent assigns data shelf-life, and the Exposure Scorer scores every link with Mosca's inequality (shelf-life, migration time, exposure) and the EU high/medium/low classes, using Q-Day scenarios from the Q-Day Scenario Modeler. Confidentiality comes first because of harvest-now-decrypt-later; signatures follow, except long-lived trust such as roots, firmware and signed records. The Dependency Mapper tags each item as controllable or externally gated, and the Cluster Planner calls the optimizer.",
+  ag:"The Data Classification Agent assigns data shelf-life, and the Exposure Scorer scores every link with Mosca's inequality (shelf-life, migration time, exposure) and the EU high/medium/low classes, using Q-Day scenarios from the Q-Day Scenario Modeler. Confidentiality comes first because of harvest-now-decrypt-later; signatures follow, except long-lived trust such as roots, signed code and signed records. The Dependency Mapper tags each item as controllable or externally gated, and the Cluster Planner calls the optimizer.",
   opt:{model:"Balanced partitioning QUBO",dec:"Migration clusters with the fewest cross-links",base:"Leiden, METIS",fit:"Moderate",Ef:.24,Eb:.2,
    text:"Balanced graph partitioning, a standard Ising/QUBO formulation, splits the dependency graph into migration clusters with the fewest cross-cluster links, so each cluster moves independently with a hybrid bridge at the seams. At enterprise scale it runs by decomposition on quantum-inspired solvers, compared against Leiden on every run; the better partition is kept."},
   watch:"Mosca inputs are estimates. Re-score automatically on threat.updated, whenever a new quantum resource estimate or data-retention rule appears.",
@@ -712,19 +711,19 @@ const WT={
   status:"Scoring risk and clustering dependencies",
   log:[["Exposure Scorer","Every link scored with Mosca's inequality"],["Data Classification Agent","Data shelf-life assigned per system"],["Dependency Mapper","Externally gated items tagged: vendors, partners, browsers"],["Cluster Planner","Dependency graph sent to the optimizer"],["Risk Lead","Risk register and clusters published","clusters.ready"]]},
  4:{win:[2027,2027.99],lead:"Policy-as-code profiles, chosen per endpoint and swappable later.",
-  ag:"The Constraint Analyst reads each endpoint's limits from the CBOM, and the Profile Designer proposes profiles from the standardized set: ML-KEM-768, or ML-KEM-1024 and ML-DSA-87 where CNSA 2.0 applies; ML-DSA-44 or 65 elsewhere; SLH-DSA or LMS/XMSS for firmware and long-lived roots. Hybrid is the default, as BSI and ANSSI recommend. The Standards Watcher tracks drafts, and the Agility Layer Engineer specifies the wrapper around vetted libraries, so a later move to FN-DSA or HQC is a policy change.",
+  ag:"The Constraint Analyst reads each endpoint's limits from the CBOM, and the Profile Designer proposes profiles from the standardized set: ML-KEM-768, or ML-KEM-1024 and ML-DSA-87 where CNSA 2.0 applies; ML-DSA-44 or 65 elsewhere; SLH-DSA or LMS/XMSS for long-lived roots and signed artifacts. Hybrid is the default, as BSI and ANSSI recommend. The Standards Watcher tracks drafts, and the Agility Layer Engineer specifies the wrapper around vetted libraries, so a later move to FN-DSA or HQC is a policy change.",
   opt:null,optNo:"Not needed: constraints already fix most choices, so the policy engine solves it.",
   watch:"Never implement cryptography inside the agility layer. Wrap production libraries such as OpenSSL 3.5+, BoringSSL or AWS-LC; liboqs is meant for prototyping.",
   gate:{who:"Crypto architect",d:"Approve the profile catalogue and policy."},
   status:"Assigning profiles behind the agility layer",
   log:[["Constraint Analyst","Endpoint constraints read: MTU, CPU, latency, regime"],["Profile Designer","Hybrid ML-KEM-768 default; ML-KEM-1024 in CNSA 2.0 scope"],["Agility Layer Engineer","Agility-layer policy generated over OpenSSL 3.5+"],["Architecture Lead","Profile catalogue approved at G3","profiles.approved"]]},
  5:{win:[2026.78,2028.99],lead:"Treat every vendor as a tracked dependency with a date.",
-  ag:"The Vendor Intelligence Agent tracks each supplier's PQC roadmap and real support; the Certification Tracker follows NIST CAVP and CMVP status; the HSM Capability Tester proves PKCS#11 v3.2 and KMIP support in the lab. The Contract Drafter writes clauses and RFP questions (roadmap dates, CBOM delivery, quantum-safe update path). Every slipped date is published and becomes a constraint for the step 8 scheduler.",
+  ag:"The Vendor Intelligence Agent tracks each supplier's PQC roadmap and real support; the Certification Tracker follows NIST CAVP and CMVP status; the Dependency Readiness Tester proves in the lab which library and runtime versions negotiate the hybrid and post-quantum profiles. The Contract Drafter writes clauses and RFP questions (roadmap dates, CBOM delivery, quantum-safe update path). Every slipped date is published and becomes a constraint for the step 8 scheduler.",
   opt:null,optNo:"No separate model: vendor dates become constraints for the step 8 scheduler.",
-  watch:"Moving to another HSM vendor often means new keys and reissuing everything that depends on them. FIPS 140-2 certificates went historical in September 2026, so check ML-KEM and ML-DSA sit inside a FIPS 140-3 boundary.",
-  gate:{who:"Procurement and legal",d:"Sign contracts and choose the HSM platform."},
+  watch:"Swapping a crypto library or runtime changes defaults, cipher names and key formats, so prove the swap in the lab first. FIPS 140-2 certificates went historical in September 2026, so check that ML-KEM and ML-DSA sit inside a FIPS 140-3 boundary of the module you use.",
+  gate:{who:"Procurement and legal",d:"Sign contracts and approve vendor and library choices."},
   status:"Vendor-gated assets wait for suppliers",
-  log:[["Vendor Intelligence Agent","PQC roadmaps collected from critical suppliers"],["Certification Tracker","CAVP and CMVP status checked"],["HSM Capability Tester","PKCS#11 v3.2 support proven in the lab"],["Contract Drafter","Clauses drafted: dates, CBOM delivery, update path"],["Vendor Lead","Slipped date sent to the scheduler","vendor.date_changed"]]},
+  log:[["Vendor Intelligence Agent","PQC roadmaps collected from critical suppliers"],["Certification Tracker","CAVP and CMVP status checked"],["Dependency Readiness Tester","Library and runtime PQC support proven in the lab"],["Contract Drafter","Clauses drafted: dates, CBOM delivery, update path"],["Vendor Lead","Slipped date sent to the scheduler","vendor.date_changed"]]},
  6:{win:[2026.78,2028.99],lead:"Make an algorithm change just another re-issue.",
   ag:"The Certificate Discovery Agent keeps the list complete, internal certificates included. The ACME Onboarding Agent moves each one to ACME or the CLM platform, the Renewal Operator runs renewals within policy (domain validation included), and the Policy Switcher changes algorithms by policy on the next renewal.",
   opt:null,optNo:"Not needed: ACME Renewal Information (RFC 9773) already spreads renewal load.",
@@ -735,8 +734,8 @@ const WT={
  7:{win:[2027,2027.99],lead:"A digital-twin lab built from the CBOM, with a Test ⇋ Repair loop.",
   ag:"The Twin Builder reproduces real network paths; the Test Matrix Designer picks the smallest covering test set (handshake size, MTU, IKEv2 fragmentation, tail latency, partner interop). The Build Verifier builds changes in the controlled workspace with known-answer test vectors; the Test Runner and Side-Channel Checker run the tests. On failure, the Failure Triage Agent pins the exact path and the Repair Agent proposes a fix, which is retested; after repeated failures it escalates to a person.",
   opt:{model:"Set-cover QUBO",dec:"Smallest test set covering every combination",base:"Pairwise tools, greedy set cover",fit:"Moderate",Ef:.25,Eb:.21,
-   text:"For large matrices, choosing the smallest test set that still covers every combination of stack, device, path and profile is a set-cover QUBO, solved quantum-inspired against a greedy and pairwise baseline. Small matrices use standard pairwise tools."},
-  watch:"Measure p99 latency, not averages: constrained devices fail at the tail. A repair is just another change, so it goes through the same tests and gate.",
+   text:"For large matrices, choosing the smallest test set that still covers every combination of stack, runtime, path and profile is a set-cover QUBO, solved quantum-inspired against a greedy and pairwise baseline. Small matrices use standard pairwise tools."},
+  watch:"Measure p99 latency, not averages: old clients and middleboxes fail at the tail. A repair is just another change, so it goes through the same tests and gate.",
   gate:{who:"Engineering leads",d:"Go or no-go for each pilot."},
   status:"Lab twin: test, repair, retest",
   log:[["Twin Builder","Digital twin of real network paths built"],["Test Runner","Handshake size, MTU and p99 latency tests running"],["Failure Triage Agent","3 failures: a middlebox drops the larger ClientHello"],["Repair Agent","Fix proposed and retested: all paths pass","repair.proposed"],["Test Lead","Pilots ready, rollback tested","test.result"]]},
@@ -749,20 +748,20 @@ const WT={
   status:"Wave rollout: hybrid key exchange",
   log:[["Scheduler Agent","Plan solved; best of optimizer and CP-SAT kept","plan.proposed"],["Wave Lead","Wave approved at G5","plan.approved"],["Change Author","X25519MLKEM768 enabled on TLS 1.3 endpoints"],["Partner Liaison","Counterparty readiness tracked; 2 partners lagging"],["Rollout Operator","Canary rollout per wave, rollback armed","change.deployed"]]},
  9:{win:[2028,2030.99],lead:"Agents prepare everything; people perform the ceremonies.",
-  ag:"The Relying-Party Mapper finds every client and device that trusts each CA; the Trust Rollout Planner orders distribution with the scheduler; the Chain Configurator prepares composite or parallel chains and signing-pipeline changes; the Ceremony Preparer writes the scripts and checklists people execute.",
+  ag:"The Relying-Party Mapper finds every client, service and runtime that trusts each CA; the Trust Rollout Planner orders distribution with the scheduler; the Chain Configurator prepares composite or parallel chains and signing-pipeline changes; the Ceremony Preparer writes the scripts and checklists people execute.",
   opt:{model:"Scheduling QUBO (step 8 model)",dec:"Trust-anchor rollout order across relying parties",base:"CP-SAT",fit:"Strong",Ef:.18,Eb:.25,
    text:"The order of trust-anchor rollout across relying parties is solved with the step 8 scheduler, against a CP-SAT baseline."},
-  watch:"LMS and XMSS are stateful: reusing a one-time key breaks security. NIST SP 800-208 requires key generation and signing inside hardware modules, and state must never be restored from backup.",
+  watch:"LMS and XMSS are stateful: reusing a one-time key breaks security. If a stateful scheme is used for a long-lived root, NIST SP 800-208 requires key generation and signing inside the customer's hardware module, and state must never be restored from backup.",
   gate:{who:"Key custodians, two-person rule",d:"Perform the root ceremony. Agents never touch private keys."},
   status:"Trust anchors propagating from the PKI",
   log:[["Relying-Party Mapper","Every relying party of the private CA mapped"],["Trust Rollout Planner","Trust-anchor distribution planned before first issuance"],["Chain Configurator","Composite chain configs and signing changes generated"],["Ceremony Preparer","Root ceremony scripted: people only, two-person rule","gate.requested"]]},
  10:{win:[2026.78,2027.95],lead:"Compliance built from the same CBOM.",
-  ag:"The SBOM/CBOM Mapper maps each product to CRA requirements (state-of-the-art cryptography, secure updates, vulnerability handling) and the EU roadmap's expectation of quantum-safe upgrades. The Boot Chain Reviewer flags designs without post-quantum signature verification, and the Documentation Writer drafts the technical documentation.",
+  ag:"The SBOM/CBOM Mapper maps each product to CRA requirements (state-of-the-art cryptography, secure updates, vulnerability handling) and the EU roadmap's expectation of quantum-safe upgrades. The Update-Path Reviewer flags products whose update mechanism cannot change algorithms or verify post-quantum signatures, and the Documentation Writer drafts the technical documentation.",
   opt:null,optNo:"Not needed at this step.",
   watch:"CRA reporting already applies since 11 September 2026: actively exploited vulnerabilities and severe incidents need an early warning within 24 hours.",
   gate:{who:"Product security officer",d:"Sign the declaration of conformity."},
   status:"Products brought into CRA compliance",
-  log:[["SBOM/CBOM Mapper","Product SBOM and CBOM mapped to CRA requirements"],["Boot Chain Reviewer","Designs without PQ signature check flagged"],["Documentation Writer","Technical documentation drafted"],["Product Compliance Lead","Conformity pack ready for G4","gate.requested"]]},
+  log:[["SBOM/CBOM Mapper","Product SBOM and CBOM mapped to CRA requirements"],["Update-Path Reviewer","Products without an algorithm-agile update path flagged"],["Documentation Writer","Technical documentation drafted"],["Product Compliance Lead","Conformity pack ready for G4","gate.requested"]]},
  11:{win:[2027,2031.99],lead:"Be ready on release day.",
   ag:"The Code Refactor Agent moves application crypto calls behind the agility layer with repository-aware changes in the controlled workspace. The Protocol Specialist handles JWT, OAuth, SAML, Kerberos and S/MIME. The Release-Day Watcher follows IETF PLANTS, the Chrome root program and identity vendors, and pre-stages each switch so it ships the day support lands.",
   opt:null,optNo:"Not needed at this step.",
@@ -770,14 +769,14 @@ const WT={
   gate:{who:"Identity architects",d:"Approve every change to sign-in flows."},
   status:"Apps behind the agility layer; public web waits for MTC",
   log:[["Code Refactor Agent","App crypto calls moved behind the agility layer"],["Protocol Specialist","JWT and SAML signing paths prepared"],["Release-Day Watcher","Following IETF PLANTS and the Chrome root program"],["Application Lead","Public-web switch pre-staged","change.deployed"]]},
- 12:{win:[2029,2035],lead:"Shield what can't change; replace it on schedule.",
-  ag:"The Key Re-wrap Planner plans re-wrapping jobs and flags data that needs full re-encryption. The Legacy Device Registrar keeps the list of non-upgradable devices with replacement dates, the Gateway Placement Agent calls the optimizer to place PQC gateways, and the OT Safety Reviewer checks every OT change.",
-  opt:{model:"Facility-location QUBO",dec:"Fewest gateways covering every non-upgradable device",base:"MILP",fit:"Strong",Ef:.16,Eb:.24,
-   text:"Choosing where to put post-quantum gateways and segmentation points is a facility-location and set-cover problem: cover every non-upgradable device with the fewest gateways inside the latency budget of control traffic, against a MILP baseline. Replacement timing joins the wave scheduler."},
-  watch:"Symmetric encryption survives; the exposure is the key exchange. Re-wrapping is enough unless wrapped keys could have been harvested in transit. Build gateways redundant.",
-  gate:{who:"OT engineers",d:"Approve every change on control networks. Safety first."},
-  status:"Gateways shield non-upgradable OT devices",
-  log:[["Key Re-wrap Planner","Re-wrapping planned for long-lived archives"],["Legacy Device Registrar","Non-upgradable devices listed with replacement dates"],["Gateway Placement Agent","Gateway placement sent to the optimizer"],["OT Safety Reviewer","Every OT change checked against safety rules","change.deployed"]]},
+ 12:{win:[2029,2035],lead:"Shield what can't change; retire it on schedule.",
+  ag:"The Key Re-wrap Planner plans re-wrapping jobs inside the KMS and flags data that needs full re-encryption. The Legacy Application Registrar keeps the list of applications that cannot upgrade, with a shield or a retirement date, the Proxy Placement Agent calls the optimizer to place TLS proxies, sidecars and API gateways, and the Legacy Change Reviewer checks every change to a legacy system for compatibility and data-integrity risk.",
+  opt:{model:"Facility-location QUBO",dec:"Fewest proxies covering every legacy application",base:"MILP",fit:"Strong",Ef:.16,Eb:.24,
+   text:"Choosing where to put TLS-terminating proxies and sidecars is a facility-location and set-cover problem: cover every legacy application with the fewest proxies inside its latency budget, against a MILP baseline. Retirement timing joins the wave scheduler."},
+  watch:"Symmetric encryption survives; the exposure is the key exchange. Re-wrapping is enough unless wrapped keys could have been harvested in transit. Build proxies redundant.",
+  gate:{who:"Application owners",d:"Approve every change to a legacy system. Data integrity first."},
+  status:"Proxies shield legacy applications",
+  log:[["Key Re-wrap Planner","Re-wrapping planned for long-lived archives"],["Legacy Application Registrar","Legacy applications listed with shield or retirement dates"],["Proxy Placement Agent","Proxy placement sent to the optimizer"],["Legacy Change Reviewer","Every legacy change checked for data-integrity risk","change.deployed"]]},
  13:{win:[2030,2035],lead:"Continuous verification and audit-ready evidence.",
   ag:"The Traffic Monitor watches live traffic for classical-only handshakes, the Downgrade Detector flags fallbacks, the Evidence Compiler builds packs mapped to the EU roadmap, NIST IR 8547, NIS2 and DORA, and the Decommission Planner stages the switch-off with exceptions.",
   opt:null,optNo:"Not needed: verification is measurement.",
@@ -805,13 +804,13 @@ const phColor=ph=>`var(--${ph})`;
 /* ===================== ROADMAP, AGENT-VS-AUTOMATION SPLIT, DECISIONS ===================== */
 /* Sources: 00_HANDOFF_README (20 Oct 2026), 02_TODO_CTO and 01_TODO_CEO, the Demonstrator Specification v1 (21 Oct 2026),
    the Intern Onboarding and Work Plan v1 (24-week plan), ADR-001 to ADR-010 (Proposed, 21 Oct 2026; ADR-009 amended 25 Oct 2026). */
-const ROAD_VERSION="Roadmap view · 3 November 2026";
+const ROAD_VERSION="Roadmap view · 9 November 2026 · software-only scope (ADR-011)";
 const ROAD_TODAY=2026.84;
 
 const ROAD_PHASES=[
  {id:"design",name:"Design",short:"Design",when:"October 2026 – Q1 2027",from:2026.72,to:2027.25,row:0,status:"now",
   goal:"Decide what to build and prove it on paper before anyone writes code, and start the first buyer conversations.",
-  done:["Full technical report (17 sections), agent catalogue (82 agents) and this agent map","Ten architecture decision records, all Proposed (ADR-001 to ADR-010)","Demonstrator specification for steps 01–02: the slice per layer, 26 acceptance tests, a 20-minute demo script","24-week intern plan with go/no-go at weeks 3, 10 and 17","US market analysis, competitor landscape (19 countries), positioning and battle cards, client maturity model, ICP and personas, discovery call script and target list","Two videos: the 18-minute explainer and the 3.5-minute pitch"],
+  done:["Full technical report (17 sections), agent catalogue (82 agents) and this agent map","Eleven architecture decision records, all Proposed (ADR-001 to ADR-011; the last one fixes the software-only scope, 9 Nov 2026)","Demonstrator specification for steps 01–02: the slice per layer, 26 acceptance tests, a 20-minute demo script","24-week intern plan with go/no-go at weeks 3, 10 and 17","US market analysis, competitor landscape (19 countries), positioning and battle cards, client maturity model, ICP and personas, discovery call script and target list","Two videos: the 18-minute explainer and the 3.5-minute pitch"],
   left:["Run the first 10–15 discovery calls and rewrite the personas from the notes","Offer ladder and pilot proposal template (CEO with CTO)","Technology landscape review and the platform security and trust document","Recruit interns A, B and C; fix the start date; accept the ADRs","EU client analysis in the same format as the US one"],
   exit:"Three interns signed, the start date fixed, the repository, the estate machine and the model API budget ready (before-day-one checklist A1–A11).",
   never:"No product claim beyond the design. Nothing scans a real system.",
@@ -821,7 +820,7 @@ const ROAD_PHASES=[
   done:[],
   left:["Agent layer: 14 agents in two teams (step 01 governance, step 02 discovery), each a registered, versioned unit with a prompt, tool scopes and an eval set","Agent safety: tool gateway with read-only scopes, injection shield, action log, model and prompt registry","Platform services: NATS bus with signed envelopes, gate service, evidence ledger, orchestrator, secrets boundary","World model: the CBOM graph in PostgreSQL, CycloneDX 1.6 and 1.7 export that validates","Engines: five wrapped scanners (code, network, config, PKI/HSM/KMS, passive traffic), CBOM builder, policy engine on OPA","People: a minimal console with the questionnaire, the gate inbox, the CBOM explorer, the coverage report and the review queue","A test estate of 20–40 endpoints with a machine-readable ground truth"],
   miles:["M3, week 3: estate ready, the four contracts frozen","M10, week 10: first CBOM from real findings; baselines and the cost per run measured","M17, week 17: one full run from questionnaire to G2; every gate test passed at least once","Week 24: the demo script runs twice in a row; reports accepted; recorded fallback produced"],
-  exit:"All gate tests pass (scope refusal, OT passive only, no private key crosses the gateway, CycloneDX validity, injection resistance, G1 and G2 round trips, event signatures, tool-scope enforcement, the full run). A new engineer reproduces the slice on a fresh machine in one day.",
+  exit:"All gate tests pass (scope refusal, scope boundary, no private key crosses the gateway, CycloneDX validity, injection resistance, G1 and G2 round trips, event signatures, tool-scope enforcement, the full run). A new engineer reproduces the slice on a fresh machine in one day.",
   never:"No transformation, testing, planning or production change is shown as working. Steps 03–14 appear only as subscribers on the bus, labelled design. No optimizer. No real customer system is scanned.",
   steps:[1,2],team:"CTO with interns A (governance agents), B (scanners) and C (CBOM graph)"},
  {id:"mvp",name:"Enterprise MVP, steps 03–08",short:"Enterprise MVP 03–08",when:"After the demonstrator · 2027–2028, planning assumption",from:2027.6,to:2028.35,row:0,status:"plan",
@@ -830,7 +829,7 @@ const ROAD_PHASES=[
   left:["Risk engine and the first optimizer (clustering and scheduling, QUBO against the classical baseline; the optimizer stack is an open decision)","Lab engine (digital twin), change engine (canary and rollback) and the controlled workspace","Integrations: PKI, HSM and KMS metadata, CI/CD, CMDB, SIEM, ticketing","Kubernetes with Helm, the air-gap bundle built by CI, and the self-hosted model path qualified with the demonstrator's eval sets","Console framework, object storage and secrets broker decided (open ADRs)","Engineering handbook, evaluation and red-team plan, first engineers (intern-to-hire)"],
   miles:["Enterprise MVP specification written with the CEO","One wave planned by the scheduler, tested in the twin, approved at G5 and deployed with rollback on a pilot-like estate"],
   exit:"A customer could run steps 01–08 on their own estate with the platform inside their environment.",
-  never:"No claim on signing migration (09), products (10), identity (11), OT (12), verification (13) or sustain (14) yet.",
+  never:"No claim on signing migration (09), software products (10), identity (11), legacy applications (12), verification (13) or sustain (14) yet.",
   steps:[3,4,5,6,7,8],team:"CTO, first engineers, interns converted to hires"},
  {id:"pilot",name:"Pilot validation",short:"Pilot",when:"2028, planning assumption",from:2028.35,to:2028.95,row:1,status:"plan",
   goal:"One paid reference pilot with a real customer, through a US integrator or prime contractor or an EU partner: steps 01–07 and one wave of changes on an agreed scope.",
@@ -841,7 +840,7 @@ const ROAD_PHASES=[
   never:"No production change outside the agreed scope; no key ceremony run by the platform.",
   steps:[1,2,3,4,5,6,7,8],team:"Company plus the partner"},
  {id:"full",name:"Full platform, steps 09–14",short:"Full platform 09–14",when:"2028 – 2030, informed by the pilot",from:2028.95,to:2030.98,row:0,status:"plan",
-  goal:"Finish the loop: private PKI and signing (09), the CRA product track (10), identity and the public web (11), data at rest and OT (12), verify and decommission (13), sustain and respond (14).",
+  goal:"Finish the loop: private PKI and signing (09), software products under the CRA (10), identity and the public web (11), data at rest and legacy applications (12), verify and decommission (13), sustain and respond (14).",
   done:[],
   left:["Detailed design of steps 09–14 from the pilot's lessons","Ledger signatures moved to ML-DSA or hybrid before the ledger holds customer evidence","US authorization path (FedRAMP or an agency authority to operate) with the partner","Optimizers for trust-anchor order, gateway placement and emergency rotation"],
   miles:["First customer reaches verified on its high-risk systems before the end-2030 deadlines"],
@@ -891,9 +890,9 @@ const ROAD_LAYERS=[
  {k:"engines",n:"6",name:"Deterministic engines",mode:"auto",what:"Scanners, CBOM builder, risk engine, optimizer, lab engine, change engine, policy engine.",
   why:"The ground truth. Facts must have measured recall and precision against a known estate, numbers must be reproducible, policy must evaluate the same way twice, and anything that touches a lab or a canary needs a deterministic rollback. A model would guess; an engine measures.",
   conf:"Engines see raw data (configurations, certificates, captured traffic) but run inside the customer's environment and expose results only through the tool gateway. Everything below the agent layer runs with the agent layer switched off."},
- {k:"integ",n:"7",name:"Integrations",mode:"auto",what:"PKI, HSM and KMS, source control and CI/CD, ticketing, CMDB, SIEM, cloud, OT taps, ERP.",
+ {k:"integ",n:"7",name:"Integrations",mode:"auto",what:"PKI, HSM and KMS, source control and CI/CD, ticketing, CMDB, SIEM, cloud, ERP.",
   why:"Read-only connectors by default; write access only through an approved change request. Credentials live in the connectors behind the secrets boundary, so no prompt injection can reach them.",
-  conf:"HSM and KMS connectors read certificates and key metadata only. No private key byte ever crosses the gateway (test E6). OT is observed through taps, never scanned actively."}
+  conf:"HSM and KMS connectors read certificates and key metadata only. No private key byte ever crosses the gateway (test E6). Nothing outside the scope contract is ever scanned, and devices and firmware are outside it by decision (ADR-011)."}
 ];
 
 const ROAD_SPLIT={
@@ -913,7 +912,7 @@ const ROAD_SPLIT={
     agent:"Read per-endpoint limits, propose profiles per endpoint type, track FIPS and IETF drafts, specify the agility wrapper.",
     why:"Standards are moving text, and a profile choice weighs constraints no single rule captures.",
     sees:"Endpoint constraints, standards documents and test results. Never key material."},
- 5:{auto:"CAVP and CMVP status feeds, HSM capability tests in the lab (PKCS#11 v3.2, KMIP), slip alerts and vendor.date_changed events for the scheduler.",
+ 5:{auto:"CAVP and CMVP status feeds for the software crypto modules in use, library and runtime readiness tests in the lab, slip alerts and vendor.date_changed events for the scheduler.",
     agent:"Read vendor roadmaps, draft contract clauses and RFP questions, keep the vendor register current.",
     why:"Vendor commitments live in PDFs and emails.",
     sees:"Vendor documents after the injection shield and the budget envelope. No write access to contract systems."},
@@ -934,17 +933,17 @@ const ROAD_SPLIT={
     why:"Trust relationships are documented inconsistently and the rollout order needs judgement.",
     sees:"CA hierarchy and certificate metadata. Never key material. Stateful signature state is never restored from backup."},
  10:{auto:"SBOM and CBOM generation per product, end-to-end tests of the update path, policy checks against CRA requirements.",
-    agent:"Map components to CRA requirements, review boot chains, draft the technical documentation.",
+    agent:"Map components to CRA requirements, review each product's update path, draft the technical documentation.",
     why:"Requirements and designs are prose.",
-    sees:"Product designs, SBOMs and firmware-signing status."},
+    sees:"Product designs, SBOMs and artifact-signing status."},
  11:{auto:"Library and configuration scans for JWT, OAuth, SAML, Kerberos, S/MIME and FIDO; routing through the agility layer; CI builds and tests.",
     agent:"Draft application changes in the workspace, track each identity provider's PQC roadmap.",
     why:"Application cryptography is buried in code that has to be read.",
     sees:"Application code in the workspace and provider documents."},
- 12:{auto:"Key re-wrap jobs inside the KMS (keys never leave it), the gateway placement optimizer (facility-location QUBO against MILP), passive OT monitoring. No active OT scan path exists.",
-    agent:"Plan the re-wraps, frame gateway placement, review OT safety cases, propose shielding or a funded replacement date.",
-    why:"Safety cases and device documentation are text, and a replacement decision weighs money against risk.",
-    sees:"Archive metadata, OT traffic captures and device documents."},
+ 12:{auto:"Key re-wrap jobs inside the KMS (keys never leave it), the proxy placement optimizer (facility-location QUBO against MILP), compatibility tests of shielded applications in the lab.",
+    agent:"Plan the re-wraps, frame proxy placement, review legacy applications for compatibility and data-integrity risk, propose a shield or a funded retirement date.",
+    why:"Legacy application documentation is text, when it exists at all, and a retirement decision weighs money against risk.",
+    sees:"Archive metadata, legacy application configurations and documentation."},
  13:{auto:"Live handshake monitoring from the SIEM, downgrade detection, classical-off enforcement by policy, audit-pack extraction from the ledger.",
     agent:"Compile the evidence packs, plan the decommissioning order.",
     why:"Auditors want narrative and proof together.",
@@ -991,7 +990,7 @@ const ROAD_ADRS=[
   over:[["A YAML rule file with a custom evaluator","We would end up writing a policy engine with no ecosystem of tests."],["Cedar or similar","Less familiar to the security teams who will read our policies."]],
   why:"Deterministic, testable and readable by the customer. One engine serves the scanners' scope checks, the safety guard and the crypto policy, and a regulator change becomes a policy change plus a re-evaluation.",
   revisit:"Customers whose GRC tooling needs another format: add an export, do not replace the engine.",src:"ADR-007_Policy_as_Code.md"},
- {id:"ADR-008",title:"Scanner wrapping and licences",dec:"One Scanner interface with one adapter per proven open-source tool, run as a subprocess; each adapter declares version, licence and redistribution status; a licence register reviewed by the CEO before any commercial shipment; active adapters reject OT ranges.",
+ {id:"ADR-008",title:"Scanner wrapping and licences",dec:"One Scanner interface with one adapter per proven open-source tool, run as a subprocess; each adapter declares version, licence and redistribution status; a licence register reviewed by the CEO before any commercial shipment; active adapters refuse any target outside the scope contract.",
   over:[["Fork and embed the tools","Copyleft obligations on our product."],["Write our own scanners","Years of work and the accuracy problem every competitor has."]],
   why:"Accuracy comes from mature tools, the bill of materials stays clean before the first sale, and every finding records tool version, command and excerpt, so it is reproducible. AgentiQ writes no cryptography and no scanner.",
   revisit:"Any licence change, the first commercial shipment, and the arrival of the Binary Analyst.",src:"ADR-008_Scanner_Wrapping_and_Licences.md"},
@@ -999,6 +998,10 @@ const ROAD_ADRS=[
   over:[["A transparency log (Trillian, Rekor)","Stronger guarantees, more infrastructure than the demonstrator needs."],["A blockchain","No."]],
   why:"Simple, auditable, replayable, in the one database we already run, and signing keys never cross into the agent layer. Ed25519 is not quantum-safe, so every signature records its algorithm and can be replaced without breaking old entries (added after the 25 October 2026 council review).",
   revisit:"A request for external verifiability, multi-tenant keys, or ML-DSA arriving in the chosen library.",src:"ADR-009_Evidence_Ledger_and_Signing.md"},
+ {id:"ADR-011",title:"Scope: software engineering migration only",d:"9 Nov 2026",dec:"AgentiQ migrates the cryptography an organization can change by changing software: code and dependencies, CI/CD, configurations and protocol settings, application and identity protocols, software PKI and signing, data at rest in software systems, the software products it ships, and legacy applications shielded by proxies or retired. Devices, firmware, OT, embedded products, HSM hardware procurement and physical gateways are out; HSMs and KMSs stay read-only integrations.",
+  over:[["Also drop PKI, certificates and signing","Wave 2 and certificate automation are software, and they carry the long-lived risk and the recurring revenue."],["Drop only OT and firmware, keep HSM procurement and embedded products","Hardware decisions dressed as software work; keeps the lab, the vendor dependence and the sealed-component problem."]],
+  why:"The team is software engineers; the gap we sell is executing software changes safely, which does not exist for a sealed device; firmware and device replacement are vendor-paced; a software-only platform runs anywhere without taps or lab hardware and sells to buyers who already own CI/CD, PKI and application portfolios.",
+  revisit:"A paying customer who needs device or firmware coverage and brings the vendor access and lab to do it, or a partner that owns the device side.",src:"ADR-011_Software_Only_Scope.md"},
  {id:"ADR-010",title:"Deployment shape",dec:"Docker Compose for the demonstrator (a platform file and an estate file plus a reset script), Kubernetes with Helm for the MVP on the same images, and an air-gap bundle built by CI from the MVP on.",
   over:[["Kubernetes from day one","Slows the interns in weeks 1–3 and makes the demo laptop heavy."],["Bare processes with systemd","Simplest for one machine, no path to the MVP."]],
   why:"A fresh machine must run the slice in a day, the estate and the platform stay separable so a pilot replaces the estate with read-only connectors, and air-gap becomes a build artefact rather than a special project.",
@@ -1011,23 +1014,23 @@ const ROAD_CHOICES=[
  ["Wrap vetted libraries, never implement cryptography","OpenSSL 3.5+, BoringSSL and AWS-LC. Algorithms are used exactly as standardized.",[4]],
  ["Solve twice, keep the better plan","Every optimizer run solves the problem with a quantum-inspired QUBO solver and with a classical baseline (Leiden, METIS, CP-SAT, MILP, greedy). Quantum-inspired is used only where it wins, and the claim stays honest.",[3,7,8,9,12,14]],
  ["Score links, not assets","A connection is safe only when both ends are upgraded, so exposure, clusters and plans are built on links.",[3]],
- ["Passive-only on OT","Active scans can crash fragile devices. OT is observed through taps and captures; no active scan path exists for OT ranges.",[2,12]],
+ ["Software only, by decision","AgentiQ migrates the cryptography an organization can change by changing software. Devices, firmware, OT and HSM hardware are out of scope (ADR-011); HSMs and KMSs stay read-only integrations where the keys live.",[2,5,10,12]],
  ["Hybrid key exchange first, signatures second","Wave 1 stops harvest-now-decrypt-later on new sessions; signatures are harder (trust-store distribution, HSM support) and come in wave 2.",[8,9]],
  ["Gates in software, not in prompts","The gate service blocks a team until a named approver decides. A model can be talked out of a rule; a service cannot.",[1,2]],
- ["Every inferred fact carries a confidence score and its provenance","Unknowns are tracked and shown, which is the answer to inventory paralysis and to sealed firmware.",[2]],
+ ["Every inferred fact carries a confidence score and its provenance","Unknowns are tracked and shown, which is the answer to inventory paralysis and to vendor components we cannot open.",[2]],
  ["Events carry references, never data","The bus holds an id, a hash and a pointer into the stores, so sensitive payloads never travel on it and every event stays small and verifiable.",[]],
  ["Inside the customer's environment, with the agents optional","On premises, private cloud or air-gapped. Everything below the agent layer runs with no model at all.",[]]
 ];
 
 const ROAD_360=[
  {h:"The problem",t:"Post-quantum migration is a scheduling problem with a deadline. Thousands of systems, each waiting on a library, a vendor, a certificate authority or a partner, must reach post-quantum cryptography before the end of 2030 (the EU high-risk deadline and the US executive order's date for key establishment), with signatures a year later. A manual program that starts today and runs six years misses it. Only 44% of US organizations have an inventory; 7% use PQC on more than half their certificates; 0 of 24 major federal agencies are fully prepared.",chips:[]},
- {h:"What AgentiQ is",t:"A controlled multi-agent platform that runs the migration inside the customer's environment. Agents propose, deterministic tools establish the facts, and people decide. One loop (Discover → Assess → Plan → Transform → Test ⇋ Repair → Validate → Monitor), 7 agent families, 82 specialist agents in 14 step teams, 7 human gates and 17 event topics on one bus.",chips:["stage:discover","stage:repair","gates"]},
+ {h:"What AgentiQ is",t:"A controlled multi-agent platform that runs the migration of an organization's software inside its own environment: code, dependencies, configurations, protocols, PKI, data at rest and the products it ships. Devices and firmware are out of scope by decision (ADR-011). Agents propose, deterministic tools establish the facts, and people decide. One loop (Discover → Assess → Plan → Transform → Test ⇋ Repair → Validate → Monitor), 7 agent families, 82 specialist agents in 14 step teams, 7 human gates and 17 event topics on one bus.",chips:["stage:discover","stage:repair","gates"]},
  {h:"The gap we fill",t:"Every tool a buyer has met stops at the inventory. AgentiQ continues: an approved scope, a live CBOM, link-level risk, a plan the optimizer orders, changes made and tested in an isolated workspace, repair, verification and a yearly rotation drill. The pitch: don't buy an inventory, buy the start of the migration.",chips:["step:2","step:8","step:13"]},
- {h:"Who we sell to",t:"US first, through an integrator or prime contractor: federal civilian agencies, defense and national-security suppliers, the largest banks, core banking processors; hospitals, utilities and OT later. The EU analysis comes next. The buyers are the CISO, the crypto architect and the PKI owner; eight personas map to the gates G1–G7.",chips:["gate:G1","gate:G3"]},
+ {h:"Who we sell to",t:"US first, through an integrator or prime contractor: federal civilian agencies, defense and national-security suppliers, the largest banks and fintech, core banking processors, software and SaaS vendors; hospitals and utilities only for their IT and application estates. The EU analysis comes next. The buyers are the CISO, the crypto architect and the PKI owner; eight personas map to the gates G1–G7.",chips:["gate:G1","gate:G3"]},
  {h:"The offer, as planned",t:"A free readiness check, then a discovery and CBOM assessment (steps 01–03), then the migration platform licence (steps 04–13), then a sustain subscription (step 14). Pricing (licence, per asset or migration as a service) is still open.",chips:["step:1","step:3","step:14"]},
- {h:"Where we are, 3 November 2026",t:"Design stage, no production code yet. Done: the technical report, the agent catalogue and this map, ten architecture decision records (Proposed), the demonstrator specification with 26 acceptance tests, the 24-week intern plan, the competitor, client and US market analyses, two videos. Next: the first discovery calls, three interns, and the steps 01–02 demonstrator, mid-2027 at the earliest.",chips:["rphase:design","rphase:demo"]},
+ {h:"Where we are, 9 November 2026",t:"Design stage, no production code yet. Scope fixed to software on 9 November (ADR-011). Done: the technical report, the agent catalogue and this map, eleven architecture decision records (Proposed), the demonstrator specification with 26 acceptance tests, the 24-week intern plan, the competitor, client and US market analyses, two videos. Next: the first discovery calls, three interns, and the steps 01–02 demonstrator, mid-2027 at the earliest.",chips:["rphase:design","rphase:demo"]},
  {h:"What we need to win",t:"A US partner, a US hosting and authorization path (FedRAMP or an agency authority to operate), the demonstrator, CBOM output aligned with CISA's minimum elements and M-26-15, an independent security review of the platform, and one reference pilot.",chips:["rphase:pilot"]},
- {h:"What we will never do",t:"See inside sealed firmware or HSMs without the vendor. Appoint owners or approve changes. Speed up FIPS or NIAP certification. Touch private keys or run key ceremonies. Create budget. Work without access. Write our own cryptography.",chips:["gate:G6","rlayer:integ"]},
+ {h:"What we will never do",t:"Touch devices, firmware or HSM hardware, or see inside a vendor's sealed component without the vendor. Appoint owners or approve changes. Speed up FIPS or NIAP certification. Touch private keys or run key ceremonies. Create budget. Work without access. Write our own cryptography.",chips:["gate:G6","rlayer:integ"]},
  {h:"How trust is built in",t:"Deployed on premises, in a private cloud or air-gapped. Agents never see secrets or private keys. Every inferred fact carries a confidence score. Production changes happen only through an approved change request with a tested rollback. Every action and decision lands in a signed, append-only ledger. Everything below the agent layer runs with the agents switched off.",chips:["rlayer:core","rlayer:safety","adr:ADR-009"]}
 ];
 
@@ -1118,7 +1121,7 @@ function renderRoadTimeline(){
   <ol class="dl-list">${ROAD_DEADLINES.map((d,i)=>`<li><span class="dnum${d.soft?" soft":""}">${i+1}</span>${esc(d.l)}</li>`).join("")}</ol>
   <p class="tl-foot">Solid blue: in progress. Dashed: planned. Amber: go to market. Red markers: deadlines that bind our buyers; grey ones matter less to us. Off the chart: NIST IR 8547 (draft) deprecates 112-bit algorithms such as RSA-2048 after 2030 and disallows all quantum-vulnerable public-key algorithms after 2035.</p>
   <div class="cards three">${ROAD_PHASES.map(p=>`<div class="card hit" data-rphase="${p.id}" tabindex="0" role="button"><div class="tagrow">${statusTag(p.status)}<span class="tag t-plan" style="text-transform:none;letter-spacing:0">${esc(p.when)}</span></div><h4>${esc(p.name)}</h4><p>${esc(p.goal)}</p><div class="chips">${p.steps.slice(0,4).map(n=>stepChip(n)).join("")}${p.steps.length>4?`<span class="chip mono" style="cursor:default">+${p.steps.length-4}</span>`:""}</div><span class="more">Milestones and exit criteria →</span></div>`).join("")}</div>
-  <p class="note">Why this order: the demonstrator covers steps 01–02 because governance and discovery are where every buyer is stuck today and where every competitor stops. The MVP adds steps 03–08 because wave 1 (hybrid key exchange) is the change that stops harvest-now-decrypt-later, and it needs risk, profiles, vendors, certificates and the Test ⇋ Repair lab first. Steps 09–14 are designed after the pilot, because signing, OT and decommissioning depend on what a real estate teaches us.</p>
+  <p class="note">Why this order: the demonstrator covers steps 01–02 because governance and discovery are where every buyer is stuck today and where every competitor stops. The MVP adds steps 03–08 because wave 1 (hybrid key exchange) is the change that stops harvest-now-decrypt-later, and it needs risk, profiles, vendors, certificates and the Test ⇋ Repair lab first. Steps 09–14 are designed after the pilot, because signing, legacy applications and decommissioning depend on what a real estate teaches us.</p>
   <p class="src">Sources: the CTO and CEO to-do lists (P0–P3), the Intern Onboarding and Work Plan v1 (Part E), the Demonstrator Specification v1 (Parts A and G), the concept note's M0–M9 plan, the US market analysis deadlines.</p>`;
 }
 
@@ -1150,8 +1153,8 @@ function renderRoadSplit(){
 function renderRoadAdr(){
   const el=document.getElementById("r-adr");
   el.innerHTML=`<h2>Why this, not that</h2>
-  <p class="lead">Ten architecture decisions, each with the options that were rejected and why, and the trigger that would reopen it. All are Proposed, pending the CTO's acceptance. Below them, the design choices that sit behind the records.</p>
-  <div class="cards two">${ROAD_ADRS.map(a=>`<div class="card hit adr" data-adr="${a.id}" tabindex="0" role="button"><span class="no">${a.id} · Proposed · 21 Oct 2026</span><h4>${esc(a.title)}</h4><p class="dec">${esc(a.dec)}</p><p class="over"><b>Not chosen:</b> ${a.over.map(o=>esc(o[0])).join(" · ")}</p><span class="more">Why, and when to revisit →</span></div>`).join("")}</div>
+  <p class="lead">Eleven architecture decisions, each with the options that were rejected and why, and the trigger that would reopen it. All are Proposed, pending the CTO's acceptance. Below them, the design choices that sit behind the records.</p>
+  <div class="cards two">${[...ROAD_ADRS].sort((x,y)=>x.id.localeCompare(y.id)).map(a=>`<div class="card hit adr" data-adr="${a.id}" tabindex="0" role="button"><span class="no">${a.id} · Proposed · ${a.d||"21 Oct 2026"}</span><h4>${esc(a.title)}</h4><p class="dec">${esc(a.dec)}</p><p class="over"><b>Not chosen:</b> ${a.over.map(o=>esc(o[0])).join(" · ")}</p><span class="more">Why, and when to revisit →</span></div>`).join("")}</div>
   <h3 class="rh">Still open</h3>
   <div class="cards"><div class="card" style="grid-column:1/-1"><ul class="open-list">${ROAD_OPEN.map(o=>`<li><b>${esc(o[0])}.</b> ${esc(o[1])}</li>`).join("")}</ul></div></div>
   <h3 class="rh">Design choices behind the records</h3>
@@ -1209,8 +1212,8 @@ function roadPanel(s){
     <h3>See also</h3><div class="chips"><button class="chip" data-road="r-road">Roadmap timeline</button><button class="chip" data-road="r-360">360° view</button></div>`;
   }
   if(s.type==="adrgroup"){
-    return `<div class="eyebrow">Decisions</div><h2>Architecture decision records</h2><p>Ten decisions, all Proposed on 21 October 2026 and pending the CTO's acceptance. Each one names the options rejected and the trigger that would reopen it.</p>
-    <ul class="agents">${ROAD_ADRS.map(a=>`<li data-adr="${a.id}" tabindex="0"><b>${a.id} · ${esc(a.title)}</b><span>${esc(a.dec)}</span></li>`).join("")}</ul>
+    return `<div class="eyebrow">Decisions</div><h2>Architecture decision records</h2><p>Eleven decisions, all Proposed and pending the CTO's acceptance: ten on 21 October 2026 and the software-only scope on 9 November 2026. Each one names the options rejected and the trigger that would reopen it.</p>
+    <ul class="agents">${[...ROAD_ADRS].sort((x,y)=>x.id.localeCompare(y.id)).map(a=>`<li data-adr="${a.id}" tabindex="0"><b>${a.id} · ${esc(a.title)}</b><span>${esc(a.dec)}</span></li>`).join("")}</ul>
     <h3>Still open</h3><ul class="plain">${ROAD_OPEN.map(o=>`<li><b>${esc(o[0])}.</b> ${esc(o[1])}</li>`).join("")}</ul>
     <h3>See also</h3><div class="chips"><button class="chip" data-road="r-adr">Why this, not that</button></div>`;
   }
@@ -1253,7 +1256,7 @@ function buildHierarchy(){
   }
   root.children.push({id:"platform",type:"group",ph:"shared",name:"Shared platform",children:PLATFORM.map(g=>({id:"g-"+g.id,type:"pgroup",ph:"shared",gid:g.id,name:g.name,children:g.kids.map((k,i)=>({id:`p-${g.id}-${i}`,type:"pitem",ph:"shared",gid:g.id,i,name:k[0]}))}))});
   root.children.push({id:"road",type:"group",ph:"road",name:"Build roadmap · 6 phases",children:ROAD_PHASES.map(p=>({id:"rp-"+p.id,type:"rphase",ph:"road",rid:p.id,name:p.short}))});
-  root.children.push({id:"adrs",type:"group",ph:"shared",name:"Design decisions · ADR-001 to 010",children:ROAD_ADRS.map(a=>({id:"adr-"+a.id,type:"adr",ph:"shared",aid:a.id,name:a.id+" "+a.title}))});
+  root.children.push({id:"adrs",type:"group",ph:"shared",name:"Design decisions · ADR-001 to 011",children:[...ROAD_ADRS].sort((x,y)=>x.id.localeCompare(y.id)).map(a=>({id:"adr-"+a.id,type:"adr",ph:"shared",aid:a.id,name:a.id+" "+a.title}))});
   root.children.push({id:"gates",type:"group",ph:"gate",name:"Human gates G1–G7",children:Object.keys(GATES).map(g=>({id:"gate-"+g,type:"gate",ph:"gate",g,name:`${g} ${GATES[g].name}`}))});
   return root;
 }
@@ -1648,10 +1651,10 @@ function renderPanel(){
     const nAgents=STEPS.reduce((a,x)=>a+x.agents.length,0);
     h=`<div class="eyebrow">Overview <span class="pill ph-fam">AgentiQ</span></div><h2>AgentiQ</h2>
     <p style="font:600 12.5px var(--f-mono);color:var(--fam);margin-top:0">Autonomous post-quantum transition</p>
-    <p>A controlled multi-agent platform that helps enterprises assess, plan, execute, validate and maintain their move from quantum-vulnerable to post-quantum cryptography. One shared knowledge base, the CBOM graph and the plan, is worked on by 14 agent teams. Teams talk only through typed events and stop at seven human gates.</p>
+    <p>A controlled multi-agent platform that helps enterprises assess, plan, execute, validate and maintain the move of their software from quantum-vulnerable to post-quantum cryptography: code, dependencies, configurations, protocols, PKI, data at rest and the products they ship. Devices, firmware and OT are out of scope by decision (ADR-011). One shared knowledge base, the CBOM graph and the plan, is worked on by 14 agent teams. Teams talk only through typed events and stop at seven human gates.</p>
     <h3>Core loop</h3><div class="chips">${STAGES.map(x=>stageChip(x.id)).join("")}</div>
     <h3>Seven AgentiQ agents</h3><div class="chips">${FAM_ORDER.map(famChip).join("")}</div>
-    <h3>At a glance</h3><ul class="plain"><li>8 lifecycle stages, 7 AgentiQ agents</li><li>3 phases, 14 step teams, ${nAgents} specialist agents</li><li>7 human gates (G1–G7)</li><li>${TOPICS.length} event topics on one bus</li><li>A Test ⇋ Repair loop, and a feedback loop from verification and monitoring back to discovery, risk, architecture and the plan</li><li>A guarded agent layer: injection shield, agent monitor, evals and red team</li><li>Changes made and tested in a controlled workspace before any change request</li><li>6 build phases and 10 architecture decisions, in the Roadmap tab</li></ul>
+    <h3>At a glance</h3><ul class="plain"><li>8 lifecycle stages, 7 AgentiQ agents</li><li>3 phases, 14 step teams, ${nAgents} specialist agents</li><li>7 human gates (G1–G7)</li><li>${TOPICS.length} event topics on one bus</li><li>A Test ⇋ Repair loop, and a feedback loop from verification and monitoring back to discovery, risk, architecture and the plan</li><li>A guarded agent layer: injection shield, agent monitor, evals and red team</li><li>Changes made and tested in a controlled workspace before any change request</li><li>6 build phases and 11 architecture decisions, in the Roadmap tab</li></ul>
     <h3>What makes it different</h3><p>Not another scanner or dashboard: a closed-loop migration engine that plans, executes, tests, diagnoses and repairs, while critical production decisions stay with people. It targets the gap between knowing what must change and safely executing and validating the change.</p>
     <h3>Phases</h3><div class="chips">${["prepare","migrate","sustain"].map(p=>`<button class="chip" data-phase="${p}" style="border-color:${phColor(p)};color:${phColor(p)}">${PHASES[p].name} · ${PHASES[p].span}</button>`).join("")}</div>
     <h3>Design principles</h3><ol class="plain" style="padding-left:20px">${PRINCIPLES.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>
@@ -1739,7 +1742,7 @@ var D=9000, AUTO=17000;
 var INTRO={n:0,title:`How AgentiQ runs the migration`,kick:`Start · Overview`,
  log:[["Orchestrator","Program loaded: 8 stages, 14 step teams, 7 human gates"],["Orchestrator","82 specialist agents ready, one shared world model"],["Optimizer","CP-SAT baseline and quantum-inspired solvers ready"],["Orchestrator","Press Play tour, or use the arrow keys"]],
  qno:`Used in 6 of 14 steps (3, 7, 8, 9, 12, 14), always benchmarked against a classical solver; the better plan is kept.`,
- gate:{c:`G1–G7`,who:`Named people`,d:`Approve every irreversible, legally binding or safety-critical action.`}};
+ gate:{c:`G1–G7`,who:`Named people`,d:`Approve every irreversible, legally binding or production-critical action.`}};
 var FINAL={n:15,title:`Result: quantum-safe, verified and agile`,kick:`Result`,win:[2026.78,2031],
  log:[["Traffic Monitor","High-risk links verified on hybrid key exchange"],["Evidence Compiler","Final evidence pack mapped to EU roadmap, NIST IR 8547, NIS2, DORA"],["Threat and Standards Watcher","Monitoring continues: NIST, IETF, ENISA, CVEs"],["Drill Coordinator","Annual algorithm-rotation drill scheduled"]],
  qno:`Five problem types solved; a classical baseline ran on every instance and the better plan was kept.`,
@@ -1775,7 +1778,7 @@ var CL=[
  {id:'Cluster C',x:.74,y:.25,n:18,t:'it',pri:.25,sx:.055,sy:.075},
  {id:'Cluster D',x:.27,y:.70,n:20,t:'it',pri:.62,sx:.06,sy:.07},
  {id:'PKI',x:.52,y:.49,n:4,t:'ca',pri:0,sx:.025,sy:.035},
- {id:'OT',x:.80,y:.67,n:16,t:'ot',pri:1,sx:.05,sy:.065},
+ {id:'Legacy apps',x:.80,y:.67,n:16,t:'ot',pri:1,sx:.05,sy:.065},
  {id:'Products',x:.54,y:.87,n:8,t:'prod',pri:1,sx:.05,sy:.025}
 ];
 var N=[];
@@ -1959,13 +1962,13 @@ var Y0=2026,Y1=2035.6;function pct(y){return (clamp(y,Y0,Y1)-Y0)/(Y1-Y0)*100;}
 (function(){var rl=$('wrail'),h='';SCENES.forEach(function(sc,i){var lbl=i===0?'Start':i===15?'Result':String(i);var q=sc.q?' q':'';h+='<button type="button" class="'+q+'" data-i="'+i+'" aria-label="'+esc(i===0?'Overview':i===15?'Result':'Step '+i+': '+sc.title)+'" title="'+esc(sc.title)+'">'+lbl+'</button>';if(i===0||i===5||i===12||i===14)h+='<span class="sep" aria-hidden="true"></span>';});rl.innerHTML=h;rl.addEventListener('click',function(e){var b=e.target.closest('button');if(b)go(+b.getAttribute('data-i'));});})();
 
 // meters
-var MET=[['cbom','Assets in CBOM'],['kex','Hybrid key exchange'],['sig','PQ signatures'],['prod','Products ready'],['ot','OT shielded'],['ver','Verified']];
+var MET=[['cbom','Assets in CBOM'],['kex','Hybrid key exchange'],['sig','PQ signatures'],['prod','Products ready'],['ot','Legacy apps shielded'],['ver','Verified']];
 $('wmeters').innerHTML=MET.map(function(m){return '<div class="m"><div class="m-top"><span>'+m[1]+'</span><b id="wmv-'+m[0]+'">0%</b></div><div class="mbar"><i id="wmb-'+m[0]+'"></i></div></div>';}).join('');
 function setMeters(c){var v={cbom:[c.cbom,N.length],kex:[c.kex,c.kexE],sig:[c.sig,c.sigE],prod:[c.prod,c.prodE],ot:[c.ot,c.otE],ver:[c.ver,N.length]};var key=JSON.stringify(v);if(key===lastMeter)return;lastMeter=key;
  MET.forEach(function(m){var a=v[m[0]][0],b=v[m[0]][1]||1,p=Math.round(a/b*100);$('wmb-'+m[0]).style.width=p+'%';$('wmv-'+m[0]).textContent=m[0]==='cbom'?(a+' / '+b):(p+'%');});}
 
 function sw(kind,col){var st='background:'+col+';';if(kind==='c')st+='border-radius:50%;';if(kind==='ring')st='border:2px solid '+col+';border-radius:50%;background:transparent;';if(kind==='dring')st='border:2px dashed '+col+';border-radius:50%;background:transparent;';if(kind==='tri')st+='clip-path:polygon(50% 0,100% 100%,0 100%);';if(kind==='dia')st+='transform:rotate(45deg) scale(.8);';if(kind==='rr')st+='border-radius:3px;';return '<i class="sw" style="'+st+'"></i>';}
-function legend(s){var L=[[sw('c','var(--muted)'),'IT system'],[sw('sq','var(--muted)'),'Partner'],[sw('tri','var(--muted)'),'OT device'],[sw('dia','var(--muted)'),'PKI / CA'],[sw('rr','var(--muted)'),'Product']];
+function legend(s){var L=[[sw('c','var(--muted)'),'IT system'],[sw('sq','var(--muted)'),'Partner'],[sw('tri','var(--muted)'),'Legacy application'],[sw('dia','var(--muted)'),'PKI / CA'],[sw('rr','var(--muted)'),'Product']];
  if(s===2)L.push([sw('dring','var(--human)'),'Inferred entry, needs review']);
  if(s>=3&&s<15){L.push([sw('c','var(--risk)'),'High risk']);L.push([sw('c','var(--human)'),'Medium']);L.push([sw('c','color-mix(in srgb, var(--ink) 42%, transparent)'),'Low']);}
  if(s>=5&&s<=8)L.push(['<svg width="11" height="12" viewBox="0 0 11 12" aria-hidden="true"><path d="M3 5.5V3.5a2.5 2.5 0 0 1 5 0v2" style="fill:none;stroke:var(--human);stroke-width:1.4"/><rect x="1.5" y="5.5" width="8" height="6" rx="1" style="fill:var(--human)"/></svg>','Vendor-gated']);
